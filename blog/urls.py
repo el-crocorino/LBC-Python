@@ -2,6 +2,7 @@ from django.conf.urls import patterns, url
 
 urlpatterns = patterns('blog.views',
     url(r'^accueil/$', 'home'),
-    url(r'^article/(\d+)/$', 'article_view'),
-    url(r'^article/(\d{4})/(\d{2})/$', 'article_list'),
+    url(r'^article/(?P<article_id>\d+)/$', 'article_view'),
+    url(r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'article_list'),
+    url(r'^redirection/$', 'redirection_view'),
 	)
