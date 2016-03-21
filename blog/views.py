@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
+from datetime import datetime
 
 def home(request):
 	text = """<h1>Bienvenue sur le blog</h1><p>J'aime bien chercher des annonces et les comparer</p>"""
@@ -26,3 +27,6 @@ def article_list(request, year, month):
 
 def redirection_view(request):
 	return HttpResponse('Vous avez été redirigé.')
+
+def tpl(request):
+	return render(request, 'blog/tpl.html', {'current_date' : datetime.now()})
