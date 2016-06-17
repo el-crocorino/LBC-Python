@@ -1,2 +1,12 @@
-<h1> Bienvenue sur l'app!</h1>
-<p>La date actuelle est {{ current_date }}</p>
+{% extends "app/base.html" %}
+
+{% block title %}Bienvenue sur l'app!{% endblock %}
+
+{% block content %}
+	<p>La date actuelle est {{ current_date }}</p>
+
+	<ul>
+		<li><a href="{% url "app.views.article_view" 42 %}">Lien vers l'article 42  de l'application </a></li>
+		{#<!-- <li><a href="{% url "app.views.article_list" 2016 03 %}">Lien vers les articles de l'application parus en janvier 2016</a></li> -->#}
+	</ul>	
+{% endblock %}

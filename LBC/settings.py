@@ -22,8 +22,6 @@ SECRET_KEY = '6se0jylna8r1^v50b4*wz2$l29_fy*_8n20ab_#7rgvhwj1@qo'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-TEMPLATE_DEBUG = True
-
 ALLOWED_HOSTS = []
 
 
@@ -90,9 +88,20 @@ ADMINS =[
 	]
 
 # Templates
-TEMPLATE_DIRS = [
-	os.path.join(BASE_DIR, 'templates')
-	]
+#TEMPLATE_DIRS = [
+#	os.path.join(BASE_DIR, 'templates')
+#	]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'debug': DEBUG,
+        }
+    },
+]
 
 # Ajout d'un slash en fin d'URL
 APPEND_SLASH = True
