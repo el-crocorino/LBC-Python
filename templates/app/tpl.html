@@ -1,8 +1,21 @@
 {% extends "app/base.html" %}
+{% load static %}
 
 {% block title %}Bienvenue sur l'app!{% endblock %}
 
+{% block nav %}
+	<ul>
+		<li><a href="/app/accueil">Accueil</a></li>
+		<li><a href="/blog/accueil">Blog</a></li>
+		<li><a href="/app/template">Application</a></li>
+		<li><a href="/app">Connexion</a></li>
+		<li><a href="/app">Mes Recherches</a></li>
+		<li><a href="/contact/">Contact</a></li>
+	</ul>
+{% endblock %}	
+
 {% block content %}
+	<img src="{% static 'kikoo.png' %}">
 	<p>La date actuelle est {{ current_date }}</p>
 
 	<ul>

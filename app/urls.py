@@ -1,4 +1,5 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import patterns, include, url
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 import app.views
 
 urlpatterns = [
@@ -8,3 +9,6 @@ urlpatterns = [
     url(r'^redirection/$', app.views.redirection_view),
     url(r'^template/$', app.views.tpl)
 ]
+
+#Debug
+urlpatterns += staticfiles_urlpatterns()
