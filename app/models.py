@@ -1,3 +1,13 @@
 from django.db import models
 
-# Create your models here.
+#class rummage(models.Model):
+    
+
+#class criteria(models.Model):
+    
+    
+#class rummage_item(models.Model):
+    
+    
+#class note(models.Model):
+
