@@ -1,0 +1,25 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block title %}Bienvenue sur l'app!{% endblock %}
+
+{% block nav %}
+	<ul>
+		<li><a href="/app/accueil">Accueil</a></li>
+		<li><a href="/blog/accueil">Blog</a></li>
+		<li><a href="/app/template">Application</a></li>
+		<li><a href="/app">Connexion</a></li>
+		<li><a href="/app">Mes Recherches</a></li>
+		<li><a href="/contact/">Contact</a></li>
+	</ul>
+{% endblock %}	
+
+{% block content %}
+	<img src="{% static 'img/kikoo.png' %}">
+	<p>La date actuelle est {{ current_date }}</p>
+
+	<ul>
+		<li><a href="{% url "app.views.article_view" 42 %}">Lien vers l'article 42  de l'application </a></li>
+		{#<!-- <li><a href="{% url "app.views.article_list" 2016 03 %}">Lien vers les articles de l'application parus en janvier 2016</a></li> -->#}
+	</ul>	
+{% endblock %}
