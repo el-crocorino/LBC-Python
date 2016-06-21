@@ -1,15 +1,15 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="fr">
 	<head>
-		<link rel="stylesheet" type="text/css" href="/media/css/style.css">
-		<title>{% block title %}Mon blog sur les petites annonces en ligne{% endblock %}</title>
+		<link rel="stylesheet" type="text/css" href="{% static 'app/style.css' %}" />
+		<title>{% block title %}Mon app sur les petites annonces en ligne{% endblock %}</title>
 	</head>
 	<body>
 		<header>Le bon coin - aide à la décision</header>
 		<nav>
 			{% block nav %}
 				<ul>
-					<li><a href="/">Accueil</a></li>
 					<li><a href="/blog">Blog</a></li>
 					<li><a href="/app">Application</a></li>
 					<li><a href="/contact/">Contact</a></li>
