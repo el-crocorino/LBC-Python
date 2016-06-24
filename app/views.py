@@ -1,11 +1,17 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
 from datetime import datetime
+from app.models import Rummage
 
 def home(request):
-	text = """<h1>Bienvenue sur le blog</h1><p>J'aime bien chercher des annonces et les comparer</p>"""
+	rummages = Rummage.objects.all()
+	return render(request, 'app/home.html', {'rummages_list':rummages})
 
-	return HttpResponse(text)
+def rummage(request, id):
+	pass
+
+def rummage_list(request, user_id):
+	pass
 
 def article_view(request, article_id):
 	"""Displays article with given id"""

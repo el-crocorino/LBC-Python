@@ -1,0 +1,21 @@
+{% extends "blog/base.html" %}
+{% load static %}
+
+{% block title %}Bienvenue sur le blog!{% endblock %}
+
+{% block content %}
+	<img src="{% static 'img/kikoo.png' %}">
+	<p>La date actuelle est {{ current_date }}</p>
+
+	{% for rummage in rummages_list %}
+		<div class="rummage">
+			<h3>{{ rummage.title }}</h3>
+			<p>{{ rummage.content | truncatewords_html:80 }}</p>
+			<p><a href="{% url "app.views.rummage" rummage.id %}">Lire la suite...</a></p>
+		</div>
+	{% empty %}
+		<p>Aucune recherche en cours</p>
+	{% endfor %}
+
+
+{% endblock %}
