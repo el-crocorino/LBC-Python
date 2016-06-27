@@ -1,0 +1,16 @@
+{% extends "blog/base.html" %}
+{% load static %}
+
+{% block title %}Liste des recherches en cours{% endblock %}
+
+{% block content %}
+	<p>Liste des recherches en cours :</p>
+	<ul>
+	{% for rummage in rummages_list %}
+			<li><a href="{% url "app.views.rummage" rummage.id %}">{{ rummage.title }}</a></li>
+	{% empty %}
+		<li>Aucune recherche en cours</li>
+	{% endfor %}
+	</ul>
+
+{% endblock %}
