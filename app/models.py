@@ -1,11 +1,10 @@
 from django.db import models
-#from django.contrib.auth.models import User
-#from core.models import User
 from django.conf import settings
 
 class Rummage(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
+    url = models.TextField()
     created_date = models.DateTimeField(auto_now_add=True, auto_now= False, verbose_name="Creation date")
     updated_date = models.DateTimeField(auto_now_add=True, auto_now= False, verbose_name="Update date")
     
@@ -25,7 +24,7 @@ class Criteria(models.Model):
 class Rummage_item(models.Model):
     rummage = models.ForeignKey('rummage', on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
-    link = models.TextField(null=True)
+    url = models.TextField()
     created_date = models.DateTimeField(auto_now_add=True, auto_now= False, verbose_name="Creation date")
     updated_date = models.DateTimeField(auto_now_add=True, auto_now= False, verbose_name="Update date")
     

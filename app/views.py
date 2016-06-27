@@ -1,17 +1,20 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.http import HttpResponse, Http404
 from datetime import datetime
-from app.models import Rummage
+from app.models import Rummage, Criteria
 
 def home(request):
 	rummages = Rummage.objects.all()
 	return render(request, 'app/home.html', {'rummages_list':rummages})
 
-def rummage(request, id):
-	pass
+def rummage(request, rummage_id):
+	rummage = get_object_or_404(Rummage, id=rummage_id)
+	criterias = Criteria.objects.filter(rummage_id=rummage.id)
+	return render(request, 'app/rummage.html', {'rummage':rummage, 'criterias':criterias})
 
 def rummage_list(request, user_id):
-	pass
+	rummages = Rummage.objects.all()
+	return render(request, 'app/home.html', {'rummages_list':rummages})
 
 def article_view(request, article_id):
 	"""Displays article with given id"""

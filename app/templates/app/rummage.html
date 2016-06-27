@@ -1,0 +1,27 @@
+{% extends "blog/base.html" %}
+{% load static %}
+
+{% block title %}{{ rummage.title }}{% endblock %}
+
+{% block content %}
+
+		<div class="rummage">
+			<h3><a href="{{ rummage.url }}">{{ rummage.title }}</a></h3>
+			<h4>Critères</h4>
+			<p>
+				<ul>
+					{% for criteria in criterias %}
+						<li>{{ criteria.name }} : {{ criteria.weight }}</li>
+					{% empty %}
+						<li>Aucun critères définis pour cette recherche actuellement.</li>
+					{% endfor %}
+				</ul>
+			</p>
+			<h4>Annonces sauvegardées:</h4>
+			<p></p>
+			<h4>Annonces disponibles:</h4>
+			<p></p>
+		</div>
+
+
+{% endblock %}
