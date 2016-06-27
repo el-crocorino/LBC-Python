@@ -1,0 +1,14 @@
+{% extends "blog/base.html" %}
+{% load static %}
+
+{% block title %}Bienvenue sur le blog!{% endblock %}
+
+{% block content %}
+	<img src="{% static 'img/kikoo.png' %}">
+	<p>La date actuelle est {{ current_date }}</p>
+
+	<ul>
+		<li><a href="{% url "blog.views.article_view" 42 %}">Lien vers l'article 42 du blog</a></li>
+		{#<!-- <li><a href="{% url "blog.views.article_list" 2016 03 %}">Lien vers les articles du blog parus en janvier 2016</a></li> -->#}
+	</ul>	
+{% endblock %}

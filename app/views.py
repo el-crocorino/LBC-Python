@@ -29,4 +29,4 @@ def redirection_view(request):
 	return HttpResponse('Vous avez été redirigé.')
 
 def tpl(request):
-	return render(request, 'blog/tpl.html', {'current_date' : datetime.now()})
+	return render(request, 'app/tpl.html', {'current_date' : datetime.now()})
