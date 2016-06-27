@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+# Register models here.
 from .models import Rummage, Criteria, Rummage_item, Note
 
 class RummageAdmin(admin.ModelAdmin):
