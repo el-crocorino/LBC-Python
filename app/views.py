@@ -12,6 +12,29 @@ def rummage(request, rummage_id):
 	criterias = Criteria.objects.filter(rummage_id=rummage.id)
 	return render(request, 'app/rummage.html', {'rummage':rummage, 'criterias':criterias})
 
+from app.forms import RummageAddForm
+
+def rummage_add(request):
+	
+	if request.method == 'POST':
+
+		form = RummageAddForm(request.POST)
+		
+		if( form.is_valid()):
+			
+			title = form.cleaned_data['title']
+			url = form.cleaned_data['url']
+			#title = form.cleaned_data['title']
+			#title = form.cleaned_data['title']
+			
+			send = True
+			
+	else :
+		form = RummageAddForm()
+		
+	return render(request, 'app/rummage_add.html', locals())
+	
+
 def rummage_list(request, user_id):
 	rummages = Rummage.objects.all()
 	return render(request, 'app/home.html', {'rummages_list':rummages})
