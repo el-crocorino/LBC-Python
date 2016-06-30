@@ -12,6 +12,7 @@
 	{% empty %}
 		<li>Aucune recherche en cours</li>
 	{% endfor %}
+		<li><a href="{% url 'app:rummage_add' %}">Nouvelle recherche</a></li>
 	</ul>
 
 {% endblock %}
