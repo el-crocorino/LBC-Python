@@ -3,14 +3,23 @@ from django.http import HttpResponse, Http404
 from datetime import datetime
 from app.models import Rummage, Criteria
 
-def home(request):
+def home(request):	
 	rummages = Rummage.objects.all()
-	return render(request, 'app/home.html', {'rummages_list':rummages})
+	context = {
+	        'rummages_list':rummages
+	}
+	
+	return render(request, 'app/index.html', context)
 
-def rummage(request, rummage_id):
+def rummage(request, rummage_id):	
 	rummage = get_object_or_404(Rummage, id=rummage_id)
 	criterias = Criteria.objects.filter(rummage_id=rummage.id)
-	return render(request, 'app/rummage.html', {'rummage':rummage, 'criterias':criterias})
+	context = {
+	        'rummage':rummage, 
+	        'criterias':criterias
+	}
+	
+	return render(request, 'app/rummage.html', context)
 
 from app.forms import RummageAddForm
 
@@ -37,7 +46,11 @@ def rummage_add(request):
 
 def rummage_list(request, user_id):
 	rummages = Rummage.objects.all()
-	return render(request, 'app/home.html', {'rummages_list':rummages})
+	context = {
+	        'rummages_list':rummages
+	}
+	
+	return render(request, 'app/index.html', context)
 
 def article_view(request, article_id):
 	"""Displays article with given id"""
@@ -61,4 +74,8 @@ def redirection_view(request):
 	return HttpResponse('Vous avez été redirigé.')
 
 def tpl(request):
-	return render(request, 'app/tpl.html', {'current_date' : datetime.now()})
+	context = {
+	        'current_date' : datetime.now()
+	}
+	
+	return render(request, 'app/tpl.html', context)

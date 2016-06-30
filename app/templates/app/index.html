@@ -7,7 +7,8 @@
 	<p>Liste des recherches en cours :</p>
 	<ul>
 	{% for rummage in rummages_list %}
-			<li><a href="{% url "app.views.rummage" rummage.id %}">{{ rummage.title }}</a></li>
+
+			<li><a href="{% url 'app:rummage' rummage.id %}">{{ rummage.title }}</a></li>
 	{% empty %}
 		<li>Aucune recherche en cours</li>
 	{% endfor %}

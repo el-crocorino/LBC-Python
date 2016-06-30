@@ -8,7 +8,7 @@
 		<div class="rummage">
 			<h3>Votre recherche :</h3>
 			{% if send %}Votre annonce a bien été envoyée.{% endif %}
-			<form action="{% url app.views.rummage_add %}" method="post">{% csrf_token %}
+			<form action="{% url 'app:rummage_add' %}" method="post">{% csrf_token %}
 				{{ form.as_p }}
 				<input type="submit" value="Ajouter" />
 			</form>
