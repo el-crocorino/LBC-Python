@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404, get_list_or_40
 from django.http import HttpResponse, Http404
 from django.contrib.auth.models import User
 from datetime import datetime
-from app.models import Rummage, Criteria
+from app.models import Rummage, Criteria, Rummage_item
 from urllib.parse import urlparse
 
 def home(request):	
@@ -33,16 +33,14 @@ def rummage(request, rummage_id):
 	for component in query_components:
 		if( 'q=' in component):
 			query_text = component[2:].replace('%20', ' ')
-	
 	query = {
 	       'category' : path_components[0],
 	       'region' : path_components[2],
-	       'city' : path_components[3],
 	       'text' : query_text,	       
 	}
 	
-	print(query)
-	
+	if( 3 in path_components):
+		query['city'] = path_components[3],
 	
 	context = {
 	        'rummage':rummage, 
@@ -74,20 +72,161 @@ def rummage_add(request):
 			
 			send = True
 			
-			
 	else :
 		form = RummageAddForm()
+		
+	return render(request, 'app/rummage_add.html', locals())
+
+def rummage_delete(request, rummage_id):
+	
+	rummage = get_object_or_404(Rummage, id=rummage_id)
+	rummage_items = Rummage_item.objects.filter(rummage_id=rummage.id)
+	criterias = Criteria.objects.filter(rummage_id=rummage.id)
+	
+	for rummage_item in rummage_items:
+		rummage_item.delete();
+	for criteria in criterias:
+		criteria.delete();
+		
+	rummage.delete();
+	
+	return redirect('app:rummage_list', user_id=1)	
+
+def rummage_update(request, rummage_id):
+	
+	rummage = get_object_or_404(Rummage, id=rummage_id)	
+	
+	if request.method == 'POST':
+
+		form = RummageAddForm(request.POST)
+		print(request.POST)
+		
+		if( form.is_valid()):
+			
+			user_id = int(form.cleaned_data['user_id'])
+			title = form.cleaned_data['title']
+			url = form.cleaned_data['url']
+						
+			rummage = Rummage()
+			rummage.user = User.objects.get(id=user_id)
+			rummage.title = title
+			rummage.url = url
+			rummage.save()
+			
+			send = True
+			
+	else :
+		form = RummageAddForm({
+		      'user_id': rummage.user_id,
+		      'title': rummage.title,
+		      'url': rummage.url,
+		})
 		
 	return render(request, 'app/rummage_add.html', locals())
 	
 
 def rummage_list(request, user_id):
+	
 	rummages = Rummage.objects.all()
 	context = {
 	        'rummages_list':rummages
 	}
 	
 	return render(request, 'app/index.html', context)
+
+
+def criteria(request, criteria_id):	
+
+	criteria = get_object_or_404(Criteria, id=criteria_id)
+
+	context = {
+	        'criteria':criteria,       
+	}
+
+	return render(request, 'app/criteria.html', context)
+
+from app.forms import CriteriaAddForm
+
+def criteria_add(request, rummage_id):
+	
+	rummage = get_object_or_404(Rummage, id=rummage_id)
+
+	if request.method == 'POST':
+
+		form = CriteriaAddForm(request.POST)
+
+		if( form.is_valid()):
+
+			name = form.cleaned_data['name']
+			weight = float(form.cleaned_data['weight'])
+
+			criteria = Criteria()
+			criteria.rummage = rummage
+			criteria.name = name
+			criteria.weight = weight
+			criteria.save()
+
+			send = True
+
+	else :
+		form = CriteriaAddForm()
+
+	return render(request, 'app/criteria_add.html', locals())
+
+def criteria_delete(request, criteria_id):
+
+	criteria = get_object_or_404(criteria, id=criteria_id)
+	rummage_id = criteria.rummage_id
+	#notes = Notes.objects.filter(criteria_id=criteria.id)
+
+	for criteria_item in criteria_items:
+		criteria_item.delete();
+	# for note in notes:
+	# 	note.delete();
+
+	criteria.delete();
+
+	return redirect('app:criteria_list', rummage_id)	
+
+def criteria_update(request, criteria_id):
+
+	criteria = get_object_or_404(Criteria, id=criteria_id)	
+	rummage_id = criteria.rummage_id
+
+	if request.method == 'POST':
+
+		form = CriteriaAddForm(request.POST)
+
+		if( form.is_valid()):
+			
+			name = form.cleaned_data['name']
+			weight = form.cleaned_data['weight']
+
+			criteria = Criteria()
+			criteria.rummage = rummage.id
+			criteria.name = name
+			criteria.weight = weight
+			criteria.save()
+
+			send = True
+
+
+	else :
+		form = CriteriaAddForm({
+		        'title': criteria.title,
+		        'url': criteria.url,
+		})
+
+	return render(request, 'app:criteria_add', locals())
+
+
+def criteria_list(request, user_id):
+	criterias = Criteria.objects.all()
+	context = {
+	        'criterias_list':criterias
+	}
+
+	return render(request, 'app:criteria_list', context)
 
 def article_view(request, article_id):
 	"""Displays article with given id"""

@@ -37,9 +37,9 @@
 					{% for criteria in criterias %}
 						<li>{{ criteria.name }} : {{ criteria.weight }}</li>
 					{% empty %}
-						<li>Aucun critère définis pour cette recherche actuellement.</li>
+						<li>Aucun critères définis pour cette recherche actuellement.</li>
 					{% endfor %}
-					<li><a href="{% url 'app:criteria_add' rummage.id %}">Ajouter un critère d'évaluation</a></li>
+					<li><a href="{% url 'app:criteria' %}">Ajouter un critère d'évaluation</a></li>
 					
 				</ul>
 			</p>

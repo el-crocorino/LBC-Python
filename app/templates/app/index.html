@@ -3,12 +3,27 @@
 
 {% block title %}Liste des recherches en cours{% endblock %}
 
+{% block nav %}
+	<ul>
+		<li><a href="/blog">Blog</a></li>
+		<li><a href="/app">Application</a></li>
+		<li><a href="/contact/">Contact</a></li>
+		<li><a href="{% url 'app:rummage_list' 1 %}">Mes recherches</a></li>
+	</ul>
+{% endblock %}	
+
 {% block content %}
 	<p>Liste des recherches en cours :</p>
 	<ul>
 	{% for rummage in rummages_list %}
 
-			<li><a href="{% url 'app:rummage' rummage.id %}">{{ rummage.title }}</a></li>
+			<li>
+				<ul>
+					<li><a href="{% url 'app:rummage' rummage.id %}">{{ rummage.title }}</a></li>
+					<li>|<a href="{% url 'app:rummage_update' rummage.id %}">Éditer</a></li>
+					<li>|<a href="{% url 'app:rummage_delete' rummage.id %}">Supprimer</a></li>
+				</ul>
+			</li>
 	{% empty %}
 		<li>Aucune recherche en cours</li>
 	{% endfor %}
