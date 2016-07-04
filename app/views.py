@@ -158,6 +158,7 @@ def criteria_add(request, rummage_id):
 		if( form.is_valid()):
 
 			name = form.cleaned_data['name']
+			print(form.cleaned_data['weight'])
 			weight = float(form.cleaned_data['weight'])
 
 			criteria = Criteria()
@@ -175,23 +176,26 @@ def criteria_add(request, rummage_id):
 
 def criteria_delete(request, criteria_id):
 
-	criteria = get_object_or_404(criteria, id=criteria_id)
+	criteria = get_object_or_404(Criteria, id=criteria_id)
 	rummage_id = criteria.rummage_id
 	#notes = Notes.objects.filter(criteria_id=criteria.id)
 
-	for criteria_item in criteria_items:
-		criteria_item.delete();
+	#for criteria_item in criteria_items:
+		#criteria_item.delete();
 	# for note in notes:
 	# 	note.delete();
 
 	criteria.delete();
-
-	return redirect('app:criteria_list', rummage_id)	
+	
+	#return redirect('app:rummage_list', user_id=1)	
+	#return redirect('app:criteria_list', rummage_id=rummage_id)
+	return redirect('app:rummage', rummage_id=rummage_id)	
 
 def criteria_update(request, criteria_id):
 
-	criteria = get_object_or_404(Criteria, id=criteria_id)	
-	rummage_id = criteria.rummage_id
+	criteria = get_object_or_404(Criteria, id=criteria_id)
+	rummage = Rummage.objects.get(id=criteria.rummage_id)
+	#rummage_id = criteria.rummage_id
 
 	if request.method == 'POST':
 
@@ -201,11 +205,10 @@ def criteria_update(request, criteria_id):
 			
 			name = form.cleaned_data['name']
 			weight = form.cleaned_data['weight']
-
-			criteria = Criteria()
-			criteria.rummage = rummage.id
+			
 			criteria.name = name
 			criteria.weight = weight
+			criteria.updated_date = datetime.now()
 			criteria.save()
 
 			send = True
@@ -213,12 +216,12 @@ def criteria_update(request, criteria_id):
 
 	else :
 		form = CriteriaAddForm({
-		        'title': criteria.title,
-		        'url': criteria.url,
+		        'name': criteria.name,
+		        'weight': criteria.weight,
 		})
 
-	return render(request, 'app:criteria_add', locals())
-
+	return render(request, 'app/criteria_add.html', locals())
+	
 
 def criteria_list(request, user_id):
 	criterias = Criteria.objects.all()

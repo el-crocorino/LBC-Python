@@ -36,6 +36,8 @@
 				<ul>
 					{% for criteria in criterias %}
 						<li>{{ criteria.name }} : {{ criteria.weight }}</li>
+						<li>|<a href="{% url 'app:criteria_update' criteria.id %}">Éditer</a></li>
+						<li>|<a href="{% url 'app:criteria_delete' criteria.id %}">Supprimer</a></li>
 					{% empty %}
 						<li>Aucun critère définis pour cette recherche actuellement.</li>
 					{% endfor %}
