@@ -13,7 +13,35 @@ def home(request):
 	
 	return render(request, 'app/index.html', context)
 
-def rummage(request, rummage_id):	
+def rummage(request, rummage_id):
+	
+	def get_ads(rummage):
+		
+		from urllib.request import urlopen
+		from bs4 import BeautifulSoup	
+		import json		
+	
+		ads_list = {}		
+		page = urlopen(rummage.url).read()
+		soup = BeautifulSoup(page)
+		soup.prettify()
+	
+		for anchor in soup.findAll('a', href=True):
+			
+			anchor_class = anchor.get('class')
+			
+			if anchor_class != None and 'list_item' in anchor_class:
+				
+				item_infos = json.loads(anchor['data-info'])
+		
+				if( item_infos.get('ad_listid') != None):
+					ads_list[item_infos.get('ad_listid')] = {
+						'title' : anchor['title'],
+						'href' : anchor['href'],
+						'data-info' : anchor['data-info'],
+					}
+	
+		return ads_list	
 	
 	rummage = get_object_or_404(Rummage, id=rummage_id)
 	criterias = Criteria.objects.filter(rummage_id=rummage.id)
@@ -40,12 +68,16 @@ def rummage(request, rummage_id):
 	}
 	
 	if( 3 in path_components):
-		query['city'] = path_components[3],
+		query['city'] = path_components[3]
+		
+	ads_list = get_ads(rummage)
+	print(ads_list)
 	
 	context = {
 	        'rummage':rummage, 
 	        'criterias':criterias,
-	        'query': query,	        
+	        'query': query,	  
+	        'ads_list' : ads_list,
 	}
 	
 	return render(request, 'app/rummage.html', context)
