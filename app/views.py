@@ -95,11 +95,10 @@ def rummage_delete(request, rummage_id):
 def rummage_update(request, rummage_id):
 	
 	rummage = get_object_or_404(Rummage, id=rummage_id)	
-	
+	print(rummage.__dict__)
 	if request.method == 'POST':
 
 		form = RummageAddForm(request.POST)
-		print(request.POST)
 		
 		if( form.is_valid()):
 			
@@ -107,10 +106,10 @@ def rummage_update(request, rummage_id):
 			title = form.cleaned_data['title']
 			url = form.cleaned_data['url']
 						
-			rummage = Rummage()
-			rummage.user = User.objects.get(id=user_id)
 			rummage.title = title
 			rummage.url = url
+			rummage.updated_date = datetime.now()			
+			print(rummage.__dict__)			
 			rummage.save()
 			
 			send = True
@@ -122,7 +121,7 @@ def rummage_update(request, rummage_id):
 		      'url': rummage.url,
 		})
 		
-	return render(request, 'app/rummage_add.html', locals())
+	return render(request, 'app/rummage_update.html', locals())
 	
 
 def rummage_list(request, user_id):
@@ -220,7 +219,7 @@ def criteria_update(request, criteria_id):
 		        'weight': criteria.weight,
 		})
 
-	return render(request, 'app/criteria_add.html', locals())
+	return render(request, 'app/criteria_update.html', locals())
 	
 
 def criteria_list(request, user_id):
