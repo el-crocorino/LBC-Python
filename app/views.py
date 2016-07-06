@@ -22,7 +22,11 @@ def rummage(request, rummage_id):
 		import json		
 	
 		ads_list = {}		
-		page = urlopen(rummage.url).read()
+
+		import codecs
+		page = codecs.open('/media/Docs/DEV/LBC/Examples/liste.html', 'r', 'windows-1252').read()
+	
+		#page = urlopen(rummage.url).read()
 		soup = BeautifulSoup(page)
 		soup.prettify()
 	
@@ -32,6 +36,11 @@ def rummage(request, rummage_id):
 			
 			if anchor_class != None and 'list_item' in anchor_class:
 				
+				item_price = anchor.find_all('h3', 'item_price')[0].contents[0];
+				
+				item_image_container = anchor.find_all('span', class_='item_imagePic')[0].contents
+				ad_image_href = 'http' + item_image_container[1].get('data-imgsrc')			
+				
 				item_infos = json.loads(anchor['data-info'])
 		
 				if( item_infos.get('ad_listid') != None):
@@ -39,6 +48,8 @@ def rummage(request, rummage_id):
 						'title' : anchor['title'],
 						'href' : anchor['href'],
 						'data-info' : anchor['data-info'],
+					        'price' : item_price,
+					        'img_src' : ad_image_href,
 					}
 	
 		return ads_list	

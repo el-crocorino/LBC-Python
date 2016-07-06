@@ -41,14 +41,24 @@
 					{% empty %}
 						<li>Aucun critère définis pour cette recherche actuellement.</li>
 					{% endfor %}
-					<li><a href="{% url 'app:criteria_add' rummage.id %}">Ajouter un critère d'évaluation</a></li>
-					
+					<li><a href="{% url 'app:criteria_add' rummage.id %}">Ajouter un critère d'évaluation</a></li>					
 				</ul>
 			</p>
 			<h4>Annonces sauvegardées:</h4>
 			<p></p>
 			<h4>Annonces disponibles:</h4>
-			<p></p>
+			<p>
+				<ul>
+					{% for ad_id, ad_infos in ads_list.items %}
+						<li><a href="{{ ad_infos.href }}">{{ ad_infos.title }} : {{ ad_infos.price }}</a></li>
+						<li><a href="{{ ad_infos.href }}"><img src="{{ ad_infos.img_src }}" alt="{{ ad_infos.title }} image"></a></li>
+						<li>|<a href="">Éditer</a></li>
+						<li>|<a href="">Supprimer</a></li>
+					{% empty %}
+						<li>Aucune annonce disponible pour cette recherche actuellement.</li>
+					{% endfor %}				
+				</ul>
+			</p>
 		</div>
 
 
