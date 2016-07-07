@@ -52,8 +52,7 @@
 					{% for ad_id, ad_infos in ads_list.items %}
 						<li><a href="{{ ad_infos.href }}">{{ ad_infos.title }} : {{ ad_infos.price }}</a></li>
 						<li><a href="{{ ad_infos.href }}"><img src="{{ ad_infos.img_src }}" alt="{{ ad_infos.title }} image"></a></li>
-						<li>|<a href="">Éditer</a></li>
-						<li>|<a href="">Supprimer</a></li>
+						<li>|<a href="">Sauvegarder</a></li>
 					{% empty %}
 						<li>Aucune annonce disponible pour cette recherche actuellement.</li>
 					{% endfor %}				

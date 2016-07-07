@@ -23,8 +23,12 @@ class Criteria(models.Model):
     
 class Rummage_item(models.Model):
     rummage = models.ForeignKey('rummage', on_delete=models.CASCADE)
+    lbc_id = models.IntegerField()    
     name = models.CharField(max_length=200)
     url = models.TextField()
+    thumbnail_url = models.TextField(null=True)
+    price = models.FloatField(null=True)
+    infos = models.TextField(null=True)
     created_date = models.DateTimeField(auto_now_add=True, auto_now= False, verbose_name="Creation date")
     updated_date = models.DateTimeField(auto_now_add=True, auto_now= False, verbose_name="Update date")
     
