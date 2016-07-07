@@ -22,11 +22,11 @@ urlpatterns = [
     url(r'^criteria_delete/(?P<criteria_id>\d+)/$', app.views.criteria_delete, name='criteria_delete'),
     url(r'^criteria_update/(?P<criteria_id>\d+)/$', app.views.criteria_update, name='criteria_update'),
     
-    url(r'^rummage_item/(?P<rummage_item_id>\d+)/$', app.views.rummage, name='rummage_item'),
-    url(r'^rummage_item_list/(?P<rummage_id>\d+)/$', app.views.rummage_list, name='rummage_item_list'),
-    url(r'^rummage_item_add/$', app.views.rummage_add, name='rummage_item_add'),
-    url(r'^rummage_item_delete/(?P<rummage_item_id>\d+)/$', app.views.rummage_delete, name='rummage_item_delete'),
-    url(r'^rummage_item_update/(?P<rummage_item_id>\d+)/$', app.views.rummage_update, name='rummage_item_update'),
+    url(r'^rummage_item/(?P<rummage_item_id>\d+)/$', app.views.rummage_item, name='rummage_item'),
+    url(r'^rummage_item_list/(?P<rummage_id>\d+)/$', app.views.rummage_item_list, name='rummage_item_list'),
+    url(r'^rummage_item_add/(?P<rummage_id>\d+)/$', app.views.rummage_item_add, name='rummage_item_add'),
+    url(r'^rummage_item_delete/(?P<rummage_item_id>\d+)/$', app.views.rummage_item_delete, name='rummage_item_delete'),
+    url(r'^rummage_item_update/(?P<rummage_item_id>\d+)/$', app.views.rummage_item_update, name='rummage_item_update'),
     
     url(r'^redirection/$', app.views.redirection_view, name='redirection'),
     url(r'^template/$', app.views.tpl, name='template'),

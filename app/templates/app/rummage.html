@@ -52,7 +52,19 @@
 					{% for ad_id, ad_infos in ads_list.items %}
 						<li><a href="{{ ad_infos.href }}">{{ ad_infos.title }} : {{ ad_infos.price }}</a></li>
 						<li><a href="{{ ad_infos.href }}"><img src="{{ ad_infos.img_src }}" alt="{{ ad_infos.title }} image"></a></li>
-						<li>|<a href="">Sauvegarder</a></li>
+						<li>|
+							<form action="{% url 'app:rummage_item_add' rummage.id %}" method="POST">{% csrf_token %}
+								<input type="hidden" name="selected" value="True">
+								<input type="hidden" name="rummage_id" value="{{ rummage.id }}">
+								<input type="hidden" name="lbc_id" value="{{ ad_id }}">
+								<input type="hidden" name="name" value="{{ ad_infos.title }}">
+								<input type="hidden" name="url" value="{{ ad_infos.href }}">
+								<input type="hidden" name="thumbnail_url" value="{{ ad_infos.img_src }}">
+								<input type="hidden" name="price" value="{{ ad_infos.price }}">
+								<input type="hidden" name="infos" value="{{ ad_infos.data_info }}">
+								<input type="submit" value="Sauvegarder cette annonce">
+							</form>
+						</li>
 					{% empty %}
 						<li>Aucune annonce disponible pour cette recherche actuellement.</li>
 					{% endfor %}				
