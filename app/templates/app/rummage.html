@@ -10,46 +10,93 @@
 		<p>Cette page vous présente les détails de la recherche sélectionnée, ainsi que les critèes associés et les annonces disponibles ou sauvegardées</p>
 	</div>
 
-		<div class="rummage">
-			<h3><a href="{{ rummage.url }}">{{ rummage.title }}</a></h3>
-			<h4>Requête</h4>
-			<ul>
-				{% if query.category %}
-					<li>Catégorie : {{ query.category }}</li>
-				{% endif %}
-				{% if query.region %}
-					<li>Région : {{ query.region }}</li>
-				{% endif %}
-				{% if query.city %}
-					<li>Ville : {{ query.city }}</li>
-				{% endif %}
-				{% if query.text %}
-					<li>Recherche : {{ query.text }}</li>
-				{% endif %}
-			</ul>
-			<h4>Critères</h4>
-			<p>
-				<ul>
-					{% for criteria in criterias %}
-						<li>{{ criteria.name }} : {{ criteria.weight }}</li>
-						<li>|<a href="{% url 'app:criteria_update' criteria.id %}">Éditer</a></li>
-						<li>|<a href="{% url 'app:criteria_delete' criteria.id %}">Supprimer</a></li>
-					{% empty %}
-						<li>Aucun critère définis pour cette recherche actuellement.</li>
-					{% endfor %}
-					<li><a href="{% url 'app:criteria_add' rummage.id %}">Ajouter un critère d'évaluation</a></li>					
-				</ul>
-			</p>
-			<h4>Annonces sauvegardées:</h4>
-			<p></p>
-			<h4>Annonces disponibles:</h4>
-			<p>
-				<ul>
-					{% for ad_id, ad_infos in ads_list.items %}
-						<li><a href="{{ ad_infos.href }}">{{ ad_infos.title }} : {{ ad_infos.price }}</a></li>
-						<li><a href="{{ ad_infos.href }}"><img src="{{ ad_infos.img_src }}" alt="{{ ad_infos.title }} image"></a></li>
-						<li>|
-							<form action="{% url 'app:rummage_item_add' rummage.id %}" method="POST">{% csrf_token %}
+	<div class="page-header">
+		<div class="row">
+    		<div class="col-md-9">
+				<a href="{{ rummage.url }}"><h1>{{ rummage.title }}</h1></a>  			
+    		</div>
+    		<div class="rummage-title-actions col-md-3">		
+				<a href="{% url 'app:rummage_update' rummage.id %}"><button type="button" class="btn btn-sm btn-default">Éditer</button></a>
+				<a href="{% url 'app:rummage_delete' rummage.id %}"><button type="button" class="btn btn-sm btn-danger">Supprimer</button></a>   
+    		</div>
+		</div> 
+	</div>
+
+	<div class="rummage-elements">
+		<h4>	
+			{% if query.category %}
+				<span class="label label-default">Catégorie : {{ query.category }}</span>
+			{% endif %}
+			{% if query.region %}
+				<span class="label label-default">Région : {{ query.region }}</span>
+			{% endif %}
+			{% if query.city %}
+				<span class="label label-default">Ville : {{ query.city }}</span>
+			{% endif %}
+			{% if query.text %}
+				<span class="label label-default">Recherche : {{ query.text }}</span>
+			{% endif %}			
+		</h4>	
+	</div>
+	
+	<h2>Critères</h2>
+
+	<div class="row">
+    	<div class="col-md-12">
+    		<table class="table table-striped table-condensed">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Critère</th>
+                <th>Poids</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+				{% for criteria in criterias %}
+	            	<tr>
+	                	<td>
+	                		#
+	                	</td>
+	                	<td>
+	                		{{ criteria.name }}
+	                	</td>
+	                	<td>
+	                		{{ criteria.weight }}
+	                	</td>
+	                	<td align="right">
+	                		<a href="{% url 'app:criteria_update' criteria.id %}"><button type="button" class="btn btn-sm btn-default">Éditer</button></a>
+	                		<a href="{% url 'app:criteria_delete' criteria.id %}"><button type="button" class="btn btn-sm btn-danger">Supprimer</button></a>        
+	                	</td>
+	            	</tr>
+				{% empty %}
+	            	<tr>
+	                	<td>Aucun critère définis pour cette recherche</td>
+	            	</tr>
+				{% endfor %}
+	            </tbody>
+            </table>
+    		<a href="{% url 'app:criteria_add' rummage.id %}"><button type="button" class="btn btn-sm btn-default">Ajouter un critère d'évaluation</button></a>
+    	</div>
+    </div>
+
+	<h2>Annonces sauvegardées:</h2>
+	<p></p>
+	<h2>Annonces disponibles:</h2>
+	<div class="row">
+    	<div class="col-md-12">
+    		<table class="table table-striped table-condensed">
+            <tbody>
+				{% for ad_id, ad_infos in ads_list.items %}
+	            	<tr>
+	                	<td>
+	                		<a href="{{ ad_infos.href }}"><img src="{{ ad_infos.img_src }}" alt="{{ ad_infos.title }} image"></a>
+	                	</td>
+	                	<td>
+	                		<a href="{{ ad_infos.href }}">{{ ad_infos.title }} : {{ ad_infos.price }}</a>
+	                	</td>
+	                	<td align="right">
+	                		<form action="{% url 'app:rummage_item_add' rummage.id %}" method="POST">{% csrf_token %}
 								<input type="hidden" name="selected" value="True">
 								<input type="hidden" name="rummage_id" value="{{ rummage.id }}">
 								<input type="hidden" name="lbc_id" value="{{ ad_id }}">
@@ -60,13 +107,18 @@
 								<input type="hidden" name="infos" value="{{ ad_infos.data_info }}">
 								<input type="submit" value="Sauvegarder cette annonce">
 							</form>
-						</li>
-					{% empty %}
-						<li>Aucune annonce disponible pour cette recherche actuellement.</li>
-					{% endfor %}				
-				</ul>
-			</p>
-		</div>
+	                	</td>
+	            	</tr>
+				{% empty %}
+	            	<tr>
+	                	<td>Aucune annonce disponible pour cette recherche actuellement.</td>
+	            	</tr>
+				{% endfor %}
+	            </tbody>
+            </table>
+    	</div>
+    </div>
+</div>
 
 
 {% endblock %}
