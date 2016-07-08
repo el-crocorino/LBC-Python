@@ -1,27 +1,29 @@
-{% extends "blog/base.html" %}
+{% extends "app/base.html" %}
 {% load static %}
 
 {% block title %}Ajouter une recherche{% endblock %}
 
-{% block nav %}
-	<ul>
-		<li><a href="/blog">Blog</a></li>
-		<li><a href="/app">Application</a></li>
-		<li><a href="/contact/">Contact</a></li>
-		<li><a href="{% url 'app:rummage_list' 1 %}">Mes recherches</a></li>
-	</ul>
-{% endblock %}	
-
 {% block content %}
 
-		<div class="rummage">
-			<h3>Votre recherche :</h3>
-			{% if send %}Votre recherche a bien été enregistrée.{% endif %}
+	<div class="jumbotron">
+		<h1>Ajouter une recherche</h1>
+		<p>Vous pouvez sauvegarder dans l'application une recherche effectuée sur le bon coin.</p>
+	</div>
+
+	<div class="page-header">
+		<h1>Nouvelle recherche</h1>
+	</div>
+
+	<div class="row">
+    	<div class="col-md-12">
+			{% if send %}
+				<div class="alert alert-success" role="alert">Votre recherche a bien été enregistrée.</div>
+			{% endif %}
 			<form action="{% url 'app:rummage_add' %}" method="post">{% csrf_token %}
 				{{ form.as_p }}
 				<input type="submit" value="Ajouter" />
 			</form>
-		</div>
-
+    	</div>
+	</div>	
 
 {% endblock %}
