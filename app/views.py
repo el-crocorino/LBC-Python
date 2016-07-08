@@ -23,10 +23,10 @@ def rummage(request, rummage_id):
 	
 		ads_list = {}		
 
-		#import codecs
-		#page = codecs.open('/media/Docs/DEV/LBC/Examples/liste.html', 'r', 'windows-1252').read()
+		import codecs
+		page = codecs.open('/media/Docs/DEV/LBC/Examples/liste.html', 'r', 'windows-1252').read()
 	
-		page = urlopen(rummage.url).read()
+		#page = urlopen(rummage.url).read()
 		soup = BeautifulSoup(page)
 		soup.prettify()
 	

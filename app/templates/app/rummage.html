@@ -1,18 +1,14 @@
-{% extends "blog/base.html" %}
+{% extends "app/base.html" %}
 {% load static %}
 
 {% block title %}{{ rummage.title }}{% endblock %}
 
-{% block nav %}
-	<ul>
-		<li><a href="/blog">Blog</a></li>
-		<li><a href="/app">Application</a></li>
-		<li><a href="/contact/">Contact</a></li>
-		<li><a href="{% url 'app:rummage_list' 1 %}">Mes recherches</a></li>
-	</ul>
-{% endblock %}	
-
 {% block content %}
+
+	<div class="jumbotron">
+		<h1>Recherche</h1>
+		<p>Cette page vous présente les détails de la recherche sélectionnée, ainsi que les critèes associés et les annonces disponibles ou sauvegardées</p>
+	</div>
 
 		<div class="rummage">
 			<h3><a href="{{ rummage.url }}">{{ rummage.title }}</a></h3>
