@@ -82,7 +82,6 @@ def rummage(request, rummage_id):
 		query['city'] = path_components[3]
 		
 	ads_list = get_ads(rummage)
-	print(ads_list)
 	
 	context = {
 	        'rummage':rummage, 
@@ -151,8 +150,7 @@ def rummage_update(request, rummage_id):
 						
 			rummage.title = title
 			rummage.url = url
-			rummage.updated_date = datetime.now()			
-			print(rummage.__dict__)			
+			rummage.updated_date = datetime.now()		
 			rummage.save()
 			
 			send = True
@@ -359,30 +357,34 @@ def rummage_item_add(request, rummage_id):
 	
 	if request.method == 'POST':
 	
-		rummage = get_object_or_404(Rummage, id=rummage_id)
-
 		form = Rummage_itemAddForm(request.POST)
+		print(float(form.data['price'][:-2]))
 		
+		#if( form.is_valid()):	
+					
+		rummage = get_object_or_404(Rummage, id = form.data['rummage_id'])
 		
-		if( form.is_valid()):
-			print(form.cleaned_data)
-			
-			user_id = int(form.cleaned_data['user_id'])
-			title = form.cleaned_data['title']
-			url = form.cleaned_data['url']
-						
-			rummage = Rummage()
-			rummage.user = User.objects.get(id=user_id)
-			rummage.title = title
-			rummage.url = url
-			rummage.save()
-			
-			send = True
+		rummage_item = Rummage_item()
+		rummage_item.rummage = rummage
+		rummage_item.lbc_id = form.data['lbc_id']
+		rummage_item.name = form.data['name']
+		rummage_item.url = form.data['url']
+		rummage_item.thumbnail_url = form.data['thumbnail_url']
+		rummage_item.price = form.data['price'][:2]
+		rummage_item.infos = form.data['infos']
+		
+		rummage_item.save()
+		
+		send = True
 			
 	else :
 		form = RummageAddForm()
 		
-	return render(request, 'app/rummage_add.html', locals())
+	context = {
+	        'rummage':rummage, 
+	}	
+		
+	return render(request, 'app/rummage.html', context)
 
 def rummage_item_delete(request, rummage_id):
 	
