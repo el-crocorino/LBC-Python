@@ -23,7 +23,7 @@ class Criteria(models.Model):
     
 class Rummage_item(models.Model):
     rummage = models.ForeignKey('rummage', on_delete=models.CASCADE)
-    lbc_id = models.IntegerField()    
+    lbc_id = models.IntegerField(null = False, unique = True)    
     name = models.CharField(max_length=200)
     url = models.TextField()
     thumbnail_url = models.TextField(null=True)

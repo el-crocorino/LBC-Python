@@ -13,80 +13,19 @@ def home(request):
 	
 	return render(request, 'app/index.html', context)
 
-def rummage(request, rummage_id):
+def rummage(request, rummage_id):		
 	
-	def get_ads(rummage):
-		
-		from urllib.request import urlopen
-		from bs4 import BeautifulSoup	
-		import json		
-	
-		ads_list = {}		
-
-		import codecs
-		page = codecs.open('/media/Docs/DEV/LBC/Examples/liste.html', 'r', 'windows-1252').read()
-	
-		#page = urlopen(rummage.url).read()
-		soup = BeautifulSoup(page)
-		soup.prettify()
-	
-		for anchor in soup.findAll('a', href=True):
-			
-			anchor_class = anchor.get('class')
-			
-			if anchor_class != None and 'list_item' in anchor_class:
-				
-				item_price = anchor.find_all('h3', 'item_price')[0].contents[0];
-				
-				item_image_container = anchor.find_all('span', class_='item_imagePic')[0].contents
-				ad_image_href = 'https:' + item_image_container[1].get('data-imgsrc')			
-				
-				item_infos = json.loads(anchor['data-info'])
-		
-				if( item_infos.get('ad_listid') != None):
-					ads_list[item_infos.get('ad_listid')] = {
-						'title' : anchor['title'],
-						'href' : anchor['href'],
-						'data_info' : anchor['data-info'],
-					        'price' : item_price,
-					        'img_src' : ad_image_href,
-					}
-	
-		return ads_list	
-	
-	rummage = get_object_or_404(Rummage, id=rummage_id)
-	criterias = Criteria.objects.filter(rummage_id=rummage.id)
-	
-	urlparts = urlparse(rummage.url);
-
-	path_components = urlparts.path.strip('/').split('/')	
-	query_components = urlparts.query.split('&')
-	
-	query_text = ''
-	
-	i = 0
-	for component in path_components:
-		path_components[i] = component.replace('_', ' ').capitalize()
-		i += 1
-	
-	for component in query_components:
-		if( 'q=' in component):
-			query_text = component[2:].replace('%20', ' ')
-	query = {
-	       'category' : path_components[0],
-	       'region' : path_components[2],
-	       'text' : query_text,	       
-	}
-	
-	if( 3 in path_components):
-		query['city'] = path_components[3]
-		
-	ads_list = get_ads(rummage)
+	rummage = get_object_or_404(Rummage, id = rummage_id)
+	criterias = Criteria.objects.filter(rummage_id = rummage.id)	
+	query = getRummageQueryInformations(rummage)
+	savedAdsList = getSavedAdsList(rummage)
+	ads_list = getAdsList(rummage)
 	
 	context = {
 	        'rummage':rummage, 
 	        'criterias':criterias,
-	        'query': query,	  
+	        'query': query,	 
+	        'savedAdsList' : savedAdsList,
 	        'ads_list' : ads_list,
 	}
 	
@@ -198,7 +137,6 @@ def criteria_add(request, rummage_id):
 		if( form.is_valid()):
 
 			name = form.cleaned_data['name']
-			print(form.cleaned_data['weight'])
 			weight = float(form.cleaned_data['weight'])
 
 			criteria = Criteria()
@@ -359,6 +297,7 @@ def rummage_item_add(request, rummage_id):
 	
 		form = Rummage_itemAddForm(request.POST)
 		print(float(form.data['price'][:-2]))
+		print(form.is_valid())
 		
 		#if( form.is_valid()):	
 					
@@ -379,11 +318,18 @@ def rummage_item_add(request, rummage_id):
 			
 	else :
 		form = RummageAddForm()
-		
+	
+	criterias = Criteria.objects.filter( rummage_id = rummage.id)	
+	query = getRummageQueryInformations( rummage)		
+	ads_list = getAdsList( rummage)
+	
 	context = {
 	        'rummage':rummage, 
-	}	
-		
+	        'criterias':criterias,
+	        'query': query,	  
+	        'ads_list' : ads_list,
+	}
+	
 	return render(request, 'app/rummage.html', context)
 
 def rummage_item_delete(request, rummage_id):
@@ -464,8 +410,104 @@ def redirection_view(request):
 	return HttpResponse('Vous avez été redirigé.')
 
 def tpl(request):
+	
+
 	context = {
 	        'current_date' : datetime.now()
 	}
 	
 	return render(request, 'app/tpl.html', context)
+
+
+def getAdsList(rummage):
+
+	from urllib.request import urlopen
+	from bs4 import BeautifulSoup	
+	import json		
+
+	ads_list = {}		
+
+	#import codecs
+	#page = codecs.open('/media/Docs/DEV/LBC/Examples/liste.html', 'r', 'windows-1252').read()
+
+	page = urlopen(rummage.url).read()
+	soup = BeautifulSoup(page)
+	soup.prettify()
+	
+	savedAdsIdList = Rummage_item.objects.values_list('lbc_id', flat = True).filter(rummage_id = rummage.id)
+	
+	for anchor in soup.findAll('a', href=True):
+
+		anchor_class = anchor.get('class')
+
+		if anchor_class != None and 'list_item' in anchor_class:
+
+			item_price = anchor.find_all('h3', 'item_price')[0].contents[0];
+
+			item_image_container = anchor.find_all('span', class_='item_imagePic')[0].contents
+			ad_image_href = 'https:' + item_image_container[1].get('data-imgsrc')			
+
+			item_infos = json.loads(anchor['data-info'])
+
+			adlist_id = item_infos.get('ad_listid')
+			
+			if( adlist_id != None and int(adlist_id) not in savedAdsIdList):
+								
+				ads_list[adlist_id] = {
+					'title' : anchor['title'],
+					'href' : anchor['href'],
+					'data_info' : anchor['data-info'],
+					'price' : item_price,
+					'img_src' : ad_image_href,
+				}
+
+	return ads_list
+
+def getSavedAdsList(rummage):
+
+	
+	rummageItemsList = Rummage_item.objects.filter(rummage_id = rummage.id)	
+	print(rummageItemsList)	
+	
+	savedAdsList = {}
+	
+	for item in rummageItemsList:
+		savedAdsList[str(item.lbc_id)] = {
+		        'name' : item.name,
+		        'url' : item.url,
+		        'infos' : item.infos,
+		        'price' : item.price,
+		        'thumbnail_url' : item.thumbnail_url,
+		        #'updated_date' : item.updated_date,
+		}	
+		
+	return savedAdsList
+
+
+def getRummageQueryInformations(rummage) :
+	
+	urlparts = urlparse(rummage.url);
+
+	path_components = urlparts.path.strip('/').split('/')	
+	query_components = urlparts.query.split('&')
+
+	query_text = ''
+
+	i = 0
+	for component in path_components:
+		path_components[i] = component.replace('_', ' ').capitalize()
+		i += 1
+
+	for component in query_components:
+		if( 'q=' in component):
+			query_text = component[2:].replace('%20', ' ')
+	query = {
+	        'category' : path_components[0],
+	        'region' : path_components[2],
+	        'text' : query_text,	       
+	}
+
+	if( 3 in path_components):
+		query['city'] = path_components[3]
+		
+	return query

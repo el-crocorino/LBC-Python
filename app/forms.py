@@ -19,5 +19,5 @@ class Rummage_itemAddForm (forms.Form):
     name = forms.CharField(max_length=200)
     #url = forms.TextField()
     #thumbnail_url = forms.TextField()
-    price = forms.FloatField()
+    price = forms.CharField()
     #infos = forms.TextField()
