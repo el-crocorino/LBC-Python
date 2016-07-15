@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
 from datetime import datetime
 from blog.models import Article
+from django.core.urlresolvers import reverse
 
 def home(request):
 	articles = Article.objects.all()

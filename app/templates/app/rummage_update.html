@@ -1,0 +1,29 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block title %}Modifier une recherche{% endblock %}
+
+{% block content %}
+
+	<div class="jumbotron">
+		<h1>Modifier une recherche</h1>
+		<p>Vous pouvez modifier une recherche effectuée sur le bon coin et enregistrée dans l'application.</p>
+	</div>
+
+	<div class="page-header">
+		<h1>Votre recherche</h1>
+	</div>
+
+	<div class="row">
+    	<div class="col-md-12">
+			{% if send %}
+				<div class="alert alert-success" role="alert">Votre recherche a bien été enregistrée.</div>
+			{% endif %}
+			<form action="{% url 'app:rummage_update' rummage.id %}" method="post">{% csrf_token %}
+				{{ form.as_p }}
+				<input type="submit" value="Enregistrer" />
+			</form>
+    	</div>
+	</div>	
+
+{% endblock %}

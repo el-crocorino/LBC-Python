@@ -1,0 +1,67 @@
+{% extends "blog/base.html" %}
+{% load static %}
+
+{% block title %}{{ rummage.title }}{% endblock %}
+
+{% block nav %}
+	<ul>
+		<li><a href="/blog">Blog</a></li>
+		<li><a href="/app">Application</a></li>
+		<li><a href="/contact/">Contact</a></li>
+		<li><a href="{% url 'app:rummage_list' 1 %}">Mes recherches</a></li>
+	</ul>
+{% endblock %}	
+
+{% block content %}
+
+		<div class="rummage">
+			<h3><a href="{{ rummage.url }}">{{ rummage.title }}</a></h3>
+			<h4>Requête</h4>
+			<ul>
+				{% if query.category %}
+					<li>Catégorie : {{ query.category }}</li>
+				{% endif %}
+				{% if query.region %}
+					<li>Région : {{ query.region }}</li>
+				{% endif %}
+				{% if query.city %}
+					<li>Ville : {{ query.city }}</li>
+				{% endif %}
+				{% if query.text %}
+					<li>Recherche : {{ query.text }}</li>
+				{% endif %}
+			</ul>
+			<h4>Critères</h4>
+			<p>
+				<ul>
+					{% for criteria in criterias %}
+						<li>{{ criteria.name }} : {{ criteria.weight }}</li>
+						<li>|<a href="{% url 'app:criteria_update' criteria.id %}">Éditer</a></li>
+						<li>|<a href="{% url 'app:criteria_delete' criteria.id %}">Supprimer</a></li>
+					{% empty %}
+						<li>Aucun critère définis pour cette recherche actuellement.</li>
+					{% endfor %}
+					<li><a href="{% url 'app:criteria_add' rummage.id %}">Ajouter un critère d'évaluation</a></li>
+					
+				</ul>
+			</p>
+			<h4>Annonces sauvegardées:</h4>
+			<p></p>
+			<h4>Annonces disponibles:</h4>
+			<p></p>
+		</div>
+
+
+{% endblock %}
+
+<!-- 
+regex : 
+www\.leboncoin\.fr\/([\w\_]+)\/offres\/([\w\_]+)\/[\w\_\/]*\?th=([\d]+)&q=([\w\d%\.\-]+)
+
+https://www.leboncoin.fr/instruments_de_musique/offres/ile_de_france/paris/?th=1&q=zoom%20R8 
+
+urlparse('https://www.leboncoin.fr/instruments_de_musique/offres/ile_de_france/paris/?th=1&q=zoom%20R8')
+
+ParseResult(scheme='https', netloc='www.leboncoin.fr', path='/instruments_de_musique/offres/ile_de_france/paris/', params='', query='th=1&q=zoom%20R8', fragment='')
+
+-->
