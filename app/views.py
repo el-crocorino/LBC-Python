@@ -212,14 +212,15 @@ def criteria_list(request, user_id):
 def rummage_item(request, rummageItemId):
 	
 	rummageItem = get_object_or_404(Rummage_item, id = rummageItemId)
-	criterias = Criteria.objects.filter(rummage_id = rummageItem.rummage_id)		
-	
+	rummage = Rummage.objects.filter(id = rummageItem.rummage_id)
+	criterias = Criteria.objects.filter(rummage_id = rummageItem.rummage_id)
 	context = {
 	        'rummageItem':rummageItem, 
+	        'rummage' : rummage,
 	        'criterias':criterias,
 	}
 	
-	return render(request, 'app/rummage.html', context)
+	return render(request, 'app/rummage_item.html', context)
 
 from app.forms import Rummage_itemAddForm
 
