@@ -75,8 +75,8 @@ def rummage_delete(request, rummage_id):
 
 def rummage_update(request, rummage_id):
 	
-	rummage = get_object_or_404(Rummage, id=rummage_id)	
-	print(rummage.__dict__)
+	rummage = get_object_or_404(Rummage, id=rummage_id)
+	
 	if request.method == 'POST':
 
 		form = RummageAddForm(request.POST)
@@ -209,82 +209,14 @@ def criteria_list(request, user_id):
 
 	return render(request, 'app:criteria_list', context)
 
-def rummage_item(request, rummage_id):
+def rummage_item(request, rummageItemId):
 	
-	def get_ads(rummage):
-		
-		from urllib.request import urlopen
-		from bs4 import BeautifulSoup	
-		import json		
-	
-		ads_list = {}		
-
-		#import codecs
-		#page = codecs.open('/media/Docs/DEV/LBC/Examples/liste.html', 'r', 'windows-1252').read()
-	
-		page = urlopen(rummage.url).read()
-		soup = BeautifulSoup(page)
-		soup.prettify()
-	
-		for anchor in soup.findAll('a', href=True):
-			
-			anchor_class = anchor.get('class')
-			
-			if anchor_class != None and 'list_item' in anchor_class:
-				
-				item_price = anchor.find_all('h3', 'item_price')[0].contents[0];
-				
-				item_image_container = anchor.find_all('span', class_='item_imagePic')[0].contents
-				ad_image_href = 'https:' + item_image_container[1].get('data-imgsrc')			
-				
-				item_infos = json.loads(anchor['data-info'])
-		
-				if( item_infos.get('ad_listid') != None):
-					ads_list[item_infos.get('ad_listid')] = {
-						'title' : anchor['title'],
-						'href' : anchor['href'],
-						'data-info' : anchor['data-info'],
-					        'price' : item_price,
-					        'img_src' : ad_image_href,
-					}
-	
-		return ads_list	
-	
-	rummage = get_object_or_404(Rummage, id=rummage_id)
-	criterias = Criteria.objects.filter(rummage_id=rummage.id)
-	
-	urlparts = urlparse(rummage.url);
-
-	path_components = urlparts.path.strip('/').split('/')	
-	query_components = urlparts.query.split('&')
-	
-	query_text = ''
-	
-	i = 0
-	for component in path_components:
-		path_components[i] = component.replace('_', ' ').capitalize()
-		i += 1
-	
-	for component in query_components:
-		if( 'q=' in component):
-			query_text = component[2:].replace('%20', ' ')
-	query = {
-	       'category' : path_components[0],
-	       'region' : path_components[2],
-	       'text' : query_text,	       
-	}
-	
-	if( 3 in path_components):
-		query['city'] = path_components[3]
-		
-	ads_list = get_ads(rummage)
-	print(ads_list)
+	rummageItem = get_object_or_404(Rummage_item, id = rummageItemId)
+	criterias = Criteria.objects.filter(rummage_id = rummageItem.rummage_id)		
 	
 	context = {
-	        'rummage':rummage, 
+	        'rummageItem':rummageItem, 
 	        'criterias':criterias,
-	        'query': query,	  
-	        'ads_list' : ads_list,
 	}
 	
 	return render(request, 'app/rummage.html', context)
@@ -296,61 +228,76 @@ def rummage_item_add(request, rummage_id):
 	if request.method == 'POST':
 	
 		form = Rummage_itemAddForm(request.POST)
-		print(float(form.data['price'][:-2]))
-		print(form.is_valid())
+		price = float(form.data['price'][:-2])
+		price *= 10
+		print(price)
+		print(price * 10)
 		
-		#if( form.is_valid()):	
+		if( form.is_valid()):	
 					
-		rummage = get_object_or_404(Rummage, id = form.data['rummage_id'])
-		
-		rummage_item = Rummage_item()
-		rummage_item.rummage = rummage
-		rummage_item.lbc_id = form.data['lbc_id']
-		rummage_item.name = form.data['name']
-		rummage_item.url = form.data['url']
-		rummage_item.thumbnail_url = form.data['thumbnail_url']
-		rummage_item.price = form.data['price'][:2]
-		rummage_item.infos = form.data['infos']
-		
-		rummage_item.save()
-		
-		send = True
+			rummage = get_object_or_404(Rummage, id = form.data['rummage_id'])
+			
+			rummage_item = Rummage_item()
+			rummage_item.rummage = rummage
+			rummage_item.lbc_id = form.data['lbc_id']
+			rummage_item.name = form.data['name']
+			rummage_item.url = form.data['url']
+			rummage_item.thumbnail_url = form.data['thumbnail_url']
+			rummage_item.price = form.data['price'][:2] 
+			rummage_item.infos = form.data['infos']
+			
+			rummage_item.save()
+			
+			send = True
 			
 	else :
 		form = RummageAddForm()
 	
 	criterias = Criteria.objects.filter( rummage_id = rummage.id)	
-	query = getRummageQueryInformations( rummage)		
+	query = getRummageQueryInformations( rummage)	
+	savedAdsList = getSavedAdsList(rummage)	
 	ads_list = getAdsList( rummage)
 	
 	context = {
 	        'rummage':rummage, 
 	        'criterias':criterias,
 	        'query': query,	  
+	        'savedAdsList' : savedAdsList,
 	        'ads_list' : ads_list,
 	}
 	
 	return render(request, 'app/rummage.html', context)
 
-def rummage_item_delete(request, rummage_id):
+def rummage_item_delete(request, rummageItemId):
 	
-	rummage = get_object_or_404(Rummage, id=rummage_id)
-	rummage_items = Rummage_item.objects.filter(rummage_id=rummage.id)
-	criterias = Criteria.objects.filter(rummage_id=rummage.id)
+	rummageItem = get_object_or_404(Rummage_item, id = rummageItemId)
+	#notes = Rummage_item.objects.filter(rummage_item_id = rummageItemId)
+	rummageId = rummageItem.rummage_id
 	
-	for rummage_item in rummage_items:
-		rummage_item.delete();
-	for criteria in criterias:
-		criteria.delete();
+	#for note in notes:
+		#note.delete()
 		
-	rummage.delete();
+	rummageItem.delete()
 	
-	return redirect('app:rummage_list', user_id=1)	
+	rummage = get_object_or_404(Rummage, id = rummageId)
+	criterias = Criteria.objects.filter( rummage_id = rummage.id)	
+	query = getRummageQueryInformations( rummage)
+	savedAdsList = getSavedAdsList(rummage)	
+	ads_list = getAdsList( rummage)
+	
+	context = {
+	        'rummage':rummage, 
+	        'criterias':criterias,
+	        'query': query,	  
+	        'savedAdsList' : savedAdsList,	        
+	        'ads_list' : ads_list,
+	}
+	
+	return render(request, 'app/rummage.html', context)	
 
 def rummage_item_update(request, rummage_id):
 	
-	rummage = get_object_or_404(Rummage, id=rummage_id)	
-	print(rummage.__dict__)
+	rummage = get_object_or_404(Rummage, id=rummage_id)
 	if request.method == 'POST':
 
 		form = RummageAddForm(request.POST)
@@ -363,8 +310,7 @@ def rummage_item_update(request, rummage_id):
 						
 			rummage.title = title
 			rummage.url = url
-			rummage.updated_date = datetime.now()			
-			print(rummage.__dict__)			
+			rummage.updated_date = datetime.now()		
 			rummage.save()
 			
 			send = True
@@ -464,21 +410,20 @@ def getAdsList(rummage):
 	return ads_list
 
 def getSavedAdsList(rummage):
-
 	
-	rummageItemsList = Rummage_item.objects.filter(rummage_id = rummage.id)	
-	print(rummageItemsList)	
+	rummageItemsList = Rummage_item.objects.filter(rummage_id = rummage.id)		
 	
 	savedAdsList = {}
 	
 	for item in rummageItemsList:
 		savedAdsList[str(item.lbc_id)] = {
+		        'id' : item.id,
 		        'name' : item.name,
 		        'url' : item.url,
 		        'infos' : item.infos,
 		        'price' : item.price,
 		        'thumbnail_url' : item.thumbnail_url,
-		        #'updated_date' : item.updated_date,
+		        'updated_date' : item.updated_date,
 		}	
 		
 	return savedAdsList
