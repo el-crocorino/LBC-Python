@@ -132,7 +132,7 @@ def criteria_add(request, rummage_id):
 
 	if request.method == 'POST':
 
-		form = CriteriaAddForm(request.POST)
+		form = CriteriaAddForm(request.POST, initial={"id_rummage": rummage_id})
 
 		if( form.is_valid()):
 
@@ -148,7 +148,7 @@ def criteria_add(request, rummage_id):
 			send = True
 
 	else :
-		form = CriteriaAddForm()
+		form = CriteriaAddForm(initial={"id_rummage": rummage_id})
 
 	return render(request, 'app/criteria_add.html', locals())
 
