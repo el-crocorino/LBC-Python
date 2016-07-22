@@ -225,18 +225,17 @@ def rummage_item(request, rummageItemId):
 from app.forms import Rummage_itemAddForm
 
 def rummage_item_add(request, rummage_id):
+			
+	rummage = get_object_or_404(Rummage, id = rummage_id)
+	#rummage = get_object_or_404(Rummage, id = form.data['rummage_id'])
 	
 	if request.method == 'POST':
 	
 		form = Rummage_itemAddForm(request.POST)
 		price = float(form.data['price'][:-2])
 		price *= 10
-		print(price)
-		print(price * 10)
 		
-		if( form.is_valid()):	
-					
-			rummage = get_object_or_404(Rummage, id = form.data['rummage_id'])
+		if( form.is_valid()):						
 			
 			rummage_item = Rummage_item()
 			rummage_item.rummage = rummage

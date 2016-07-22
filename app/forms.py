@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 
 from django import forms
-from django.forms import ModelForm
+from django.forms import ModelForm, widgets
 from app.models import Rummage, Criteria, Rummage_item
 
 class RummageAddForm (forms.Form):
@@ -10,21 +10,44 @@ class RummageAddForm (forms.Form):
     url = forms.CharField(label=u"URL : ", help_text=u"Collez ici l'adresse de votre page de recherche", required=True)   
     
 class CriteriaAddForm (ModelForm):
-#class CriteriaAddForm (forms.Form):
-    #rummage_id = forms.IntegerField(label=u"Id recherche", required=True, widget=forms.HiddenInput())
-    #name = forms.CharField(max_length=100, label=u"Nom :", required=True)
-    #weight = forms.FloatField(label=u"Poids (0,1; 0,3; ...) : ", help_text=u"La somme de l'ensemble des critères doit être égale à 1", min_value=0.0, max_value=1.0, required=True)
 
     class Meta:
         model = Criteria
-        exclude = ('id', 'rummage_id', 'created_date','updated_date') 
+        exclude = ( 'rummage', 'created_date','updated_date')  
+        labels = {
+            "name": "Nom :",
+            "weight": "Poids (0,1; 0,3; ...) :"
+        }        
+        widgets = {
+            'weight': widgets.NumberInput( attrs = {
+                'step' : '0.01',
+                'min' : '0.0',
+                'max' : '1.0',
+            })
+        }        
     
-class Rummage_itemAddForm (forms.Form):    
-    #rummage_id = forms.IntegerField(max_length=10, label=u"Id recherche", required=True)
-    selected = forms.BooleanField()
-    lbc_id = forms.IntegerField()    
-    name = forms.CharField(max_length=200)
-    #url = forms.CharField()
-    #thumbnail_url = forms.CharField()
-    price = forms.CharField()
-    #infos = forms.CharField()
+class Rummage_itemAddForm (ModelForm):    
+#class Rummage_itemAddForm (forms.Form):    
+    ##rummage_id = forms.IntegerField(max_length=10, label=u"Id recherche", required=True)
+    #selected = forms.BooleanField()
+    #lbc_id = forms.IntegerField()    
+    #name = forms.CharField(max_length=200)
+    ##url = forms.CharField()
+    ##thumbnail_url = forms.CharField()
+    #price = forms.CharField()
+    ##infos = forms.CharField()   
+    
+    class Meta:
+        model = Rummage_item
+        exclude = ('rummage', 'created_date','updated_date')  
+        labels = {
+            "name": "Nom :",
+            "weight": "Poids (0,1; 0,3; ...) :"
+        }        
+        widgets = {
+            'weight': widgets.NumberInput( attrs = {
+                'step' : '0.01',
+                'min' : '0.0',
+                'max' : '1.0',
+            })
+        }      

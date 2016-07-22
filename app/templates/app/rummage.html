@@ -141,7 +141,7 @@
 								<input type="hidden" name="infos" value="{{ ad_infos.data_info }}">
 								<input type="submit" value="Sauvegarder">
 							</form> -->
-	                		<a href="{% url 'app:rummage_item_delete' ad_id %}"><button type="button" class="btn btn-sm btn-default">Sauvegarder</button>
+	                		<a href="{% url 'app:rummage_item_add' rummage.id %}"><button type="button" class="btn btn-sm btn-default">Sauvegarder</button>
 	                		<a href="{% url 'app:rummage_item_delete' ad_id %}"><button type="button" class="btn btn-sm btn-danger">Ignorer</button></a>  
 	                	</td>
 	            	</tr>
