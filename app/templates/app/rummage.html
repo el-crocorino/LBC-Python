@@ -130,7 +130,7 @@
 	                		<!-- {{ ad_infos.title }} TODO display post date -->
 	                	</td>
 	                	<td align="right" width="20%">
-	                		<!-- <form action="{% url 'app:rummage_item_add' rummage.id %}" method="POST">{% csrf_token %}
+	                		<form action="{% url 'app:rummage_item_add' rummage.id %}" method="POST">{% csrf_token %}
 								<input type="hidden" name="selected" value="True">
 								<input type="hidden" name="rummage_id" value="{{ rummage.id }}">
 								<input type="hidden" name="lbc_id" value="{{ ad_id }}">
@@ -139,9 +139,8 @@
 								<input type="hidden" name="thumbnail_url" value="{{ ad_infos.img_src }}">
 								<input type="hidden" name="price" value="{{ ad_infos.price }}">
 								<input type="hidden" name="infos" value="{{ ad_infos.data_info }}">
-								<input type="submit" value="Sauvegarder">
-							</form> -->
-	                		<a href="{% url 'app:rummage_item_add' rummage.id %}"><button type="button" class="btn btn-sm btn-default">Sauvegarder</button>
+								<input type="submit" class="btn btn-sm btn-default" value="Sauvegarder">
+							</form>
 	                		<a href="{% url 'app:rummage_item_delete' ad_id %}"><button type="button" class="btn btn-sm btn-danger">Ignorer</button></a>  
 	                	</td>
 	            	</tr>
