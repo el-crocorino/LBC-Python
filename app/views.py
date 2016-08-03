@@ -132,7 +132,7 @@ def criteria_add(request, rummage_id):
 
 	if request.method == 'POST':
 
-		form = CriteriaAddForm(request.POST)
+		form = CriteriaAddForm(request.POST, initial={"id_rummage": rummage_id})
 
 		if( form.is_valid()):
 
@@ -148,7 +148,7 @@ def criteria_add(request, rummage_id):
 			send = True
 
 	else :
-		form = CriteriaAddForm()
+		form = CriteriaAddForm(initial={"id_rummage": rummage_id})
 
 	return render(request, 'app/criteria_add.html', locals())
 
@@ -212,8 +212,9 @@ def criteria_list(request, user_id):
 def rummage_item(request, rummageItemId):
 	
 	rummageItem = get_object_or_404(Rummage_item, id = rummageItemId)
-	rummage = Rummage.objects.filter(id = rummageItem.rummage_id)
+	rummage = Rummage.objects.filter(id = rummageItem.rummage_id)[0]
 	criterias = Criteria.objects.filter(rummage_id = rummageItem.rummage_id)
+
 	context = {
 	        'rummageItem':rummageItem, 
 	        'rummage' : rummage,
@@ -225,18 +226,17 @@ def rummage_item(request, rummageItemId):
 from app.forms import Rummage_itemAddForm
 
 def rummage_item_add(request, rummage_id):
+			
+	rummage = get_object_or_404(Rummage, id = rummage_id)
+	#rummage = get_object_or_404(Rummage, id = form.data['rummage_id'])	
 	
 	if request.method == 'POST':
 	
 		form = Rummage_itemAddForm(request.POST)
 		price = float(form.data['price'][:-2])
 		price *= 10
-		print(price)
-		print(price * 10)
 		
-		if( form.is_valid()):	
-					
-			rummage = get_object_or_404(Rummage, id = form.data['rummage_id'])
+		if( form.is_valid()):						
 			
 			rummage_item = Rummage_item()
 			rummage_item.rummage = rummage
@@ -335,6 +335,10 @@ def rummage_item_list(request, user_id):
 	
 	return render(request, 'app/index.html', context)
 
+
+def rummage_item_note(request, rummageItemId):
+	pass
+
 def article_view(request, article_id):
 	"""Displays article with given id"""
 	
@@ -374,10 +378,10 @@ def getAdsList(rummage):
 
 	ads_list = {}		
 
-	#import codecs
-	#page = codecs.open('/media/Docs/DEV/LBC/Examples/liste.html', 'r', 'windows-1252').read()
+	import codecs
+	page = codecs.open('/media/Docs/DEV/LBC/Examples/liste.html', 'r', 'windows-1252').read()
 
-	page = urlopen(rummage.url).read()
+	#page = urlopen(rummage.url).read()
 	soup = BeautifulSoup(page)
 	soup.prettify()
 	
@@ -389,13 +393,14 @@ def getAdsList(rummage):
 
 		if anchor_class != None and 'list_item' in anchor_class:
 
-			item_price = anchor.find_all('h3', 'item_price')[0].contents[0];
-
-			item_image_container = anchor.find_all('span', class_='item_imagePic')[0].contents
-			ad_image_href = 'https:' + item_image_container[1].get('data-imgsrc')			
-
+			item_price = anchor.find_all('h3', 'item_price')[0].contents[0]
+			item_image_container = anchor.find_all('span', class_='item_imagePic')[0].contents						
+			ad_image_href = 'https:'
+			
+			if (item_image_container != ['\n']): 
+				ad_image_href += item_image_container[1].get('data-imgsrc')			
+				
 			item_infos = json.loads(anchor['data-info'])
-
 			adlist_id = item_infos.get('ad_listid')
 			
 			if( adlist_id != None and int(adlist_id) not in savedAdsIdList):
