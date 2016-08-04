@@ -336,7 +336,7 @@ def rummage_item_list(request, user_id):
 	return render(request, 'app/index.html', context)
 
 
-def rummage_item_note(request, rummageItemId):
+def note_add(request, rummageItemId):
 	pass
 
 def article_view(request, article_id):

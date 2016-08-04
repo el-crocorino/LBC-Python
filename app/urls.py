@@ -27,7 +27,8 @@ urlpatterns = [
     url(r'^rummage_item_add/(?P<rummage_id>\d+)/$', app.views.rummage_item_add, name='rummage_item_add'),
     url(r'^rummage_item_delete/(?P<rummageItemId>\d+)/$', app.views.rummage_item_delete, name='rummage_item_delete'),
     url(r'^rummage_item_update/(?P<rummage_item_id>\d+)/$', app.views.rummage_item_update, name='rummage_item_update'),
-    url(r'^rummage_item_note/(?P<rummageItemId>\d+)/$', app.views.rummage_item_note, name='rummage_item_note'),
+    
+    url(r'^note_add/(?P<rummageItemId>\d+)/$', app.views.note_add, name='note_add'),
     
     
     url(r'^redirection/$', app.views.redirection_view, name='redirection'),
