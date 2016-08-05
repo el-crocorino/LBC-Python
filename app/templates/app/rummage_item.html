@@ -40,9 +40,7 @@
 						{% for criteria in criterias %}
 			            	<tr>
 			                	<td>
-			                		#
 						            {{ criteria.id }} 
-						            {{ rummage.id }}
 			                	</td>
 			                	<td>
 			                		{{ criteria.name }}
@@ -51,7 +49,13 @@
 			                		{{ criteria.weight }}
 			                	</td>
 			                	<td align="right">
-									<input type="text" name="{{ criteria.id }}"> / 5
+									<input type="text" name="{{ criteria.id }}" value="
+										{% if notes_list.all and notes_list[criteria.id] %}
+											{{ notes_list[{{ criteria.id }}] }}
+										{% else %}
+											0.0
+										{% endif %}
+									"> / 5
 			                	</td>
 			            	</tr>
 						{% empty %}

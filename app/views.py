@@ -214,16 +214,20 @@ def rummage_item(request, rummageItemId):
 	rummageItem = get_object_or_404(Rummage_item, id = rummageItemId)
 	rummage = Rummage.objects.filter(id = rummageItem.rummage_id)[0]
 	criterias = Criteria.objects.filter(rummage_id = rummageItem.rummage_id)
-
-	#from django.forms import modelformset_factory
-	#from app.forms import NoteAddForm
-	#NoteFormSet = modelformset_factory(Note, fields=('note',))
-	#formset = NoteFormSet()
+	notes = Note.objects.filter(rummage_item_id = rummageItemId)
+	print(notes.query)
+	print(notes)
+	
+	notes_list = {}
+	for note  in notes:
+		notes_list[note.criteria_id] = note.note
+	print(notes_list)
 
 	context = {
 	        'rummageItem':rummageItem, 
 	        'rummage' : rummage,
 	        'criterias':criterias,
+	        'notes_list' : notes_list,
 	}
 	
 	return render(request, 'app/rummage_item.html', context)
@@ -233,7 +237,6 @@ from app.forms import Rummage_itemAddForm
 def rummage_item_add(request, rummage_id):
 			
 	rummage = get_object_or_404(Rummage, id = rummage_id)
-	#rummage = get_object_or_404(Rummage, id = form.data['rummage_id'])	
 	
 	if request.method == 'POST':
 	
@@ -349,10 +352,12 @@ def note_add(request, rummageItemId):
 	if request.method == 'POST':
 
 		form = NoteAddForm(request.POST, initial={"rummage_item_id": rummageItemId})
-
+	
+		#if( form.is_valid()):
 		for key, value in form.data.items():
 
 			if( key != 'csrfmiddlewaretoken'):
+				
 				note = Note();
 				note.criteria_id = int(key)
 				note.rummage_item_id = rummageItemId
@@ -361,20 +366,9 @@ def note_add(request, rummageItemId):
 				note.updated_date = datetime.now()
 				
 				note.save()
-				
-		#if( form.is_valid()):
-						
-			#rummage_item = Rummage_item()
-			#rummage_item.rummage = rummage
-			#rummage_item.lbc_id = form.data['lbc_id']
-			
-			
-				
-	context = {
-	        'rummageItemId' : rummageItemId,
-        }
-	
-	return render(request, 'app/rummage_item.html', context)	
+		
+		
+	return render(request, 'app/rummage_update.html', locals())	
 
 def article_view(request, article_id):
 	"""Displays article with given id"""
