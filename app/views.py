@@ -213,15 +213,8 @@ def rummage_item(request, rummageItemId):
 	
 	rummageItem = get_object_or_404(Rummage_item, id = rummageItemId)
 	rummage = Rummage.objects.filter(id = rummageItem.rummage_id)[0]
-	criterias = Criteria.objects.filter(rummage_id = rummageItem.rummage_id)
-	notes = Note.objects.filter(rummage_item_id = rummageItemId)
-	print(notes.query)
-	print(notes)
-	
-	notes_list = {}
-	for note  in notes:
-		notes_list[note.criteria_id] = note.note
-	print(notes_list)
+	criterias = Criteria.objects.filter(rummage_id = rummageItem.rummage_id)	
+	notes_list = getNotesList(rummageItemId)
 
 	context = {
 	        'rummageItem':rummageItem, 
@@ -358,17 +351,30 @@ def note_add(request, rummageItemId):
 
 			if( key != 'csrfmiddlewaretoken'):
 				
-				note = Note();
+				noteQuery = Note.objects.filter(rummage_item_id = rummageItemId).filter(criteria_id = key)				
+				
+				if( noteQuery != None): 
+					note = noteQuery[0]
+				else:
+					note = Note();
+					note.created_date = datetime.now()
+				
 				note.criteria_id = int(key)
 				note.rummage_item_id = rummageItemId
 				note.note = float(value[0])
-				note.created_date = datetime.now()
 				note.updated_date = datetime.now()
 				
-				note.save()
+				note.save()				
 		
+	context = {
+	        'rummageItemId':rummageItemId,
+	        'rummageItem':rummageItem,
+	        'rummage' : Rummage.objects.get(id = rummageItem.rummage_id),
+	        'criterias' : Criteria.objects.filter(rummage_id = rummageItem.rummage_id),
+	        'notes_list' : getNotesList(rummageItemId),        
+	}
 		
-	return render(request, 'app/rummage_update.html', locals())	
+	return render(request, 'app/rummage_item.html', context)	
 
 def article_view(request, article_id):
 	"""Displays article with given id"""
@@ -493,3 +499,13 @@ def getRummageQueryInformations(rummage) :
 		query['city'] = path_components[3]
 		
 	return query
+
+def getNotesList(rummageItemId):
+	
+	notes = Note.objects.filter(rummage_item_id = rummageItemId)	
+	notesList = {}
+	
+	for note  in notes:
+		notesList[note.criteria_id] = note.note
+
+	return notesList
