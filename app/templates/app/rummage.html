@@ -97,6 +97,9 @@
 	                	<td>
 	                		{{ ad_infos.updated_date }}
 	                	</td>
+	                	<td>
+	                		{{ ad_infos.score }}
+	                	</td>
 	                	<td align="right" width="20%">
 	                		<a href="{% url 'app:rummage_item' ad_infos.id %}"><button type="button" class="btn btn-sm btn-default">Noter</button></a>  
 	                		<a href="{% url 'app:rummage_item_delete' ad_infos.id %}"><button type="button" class="btn btn-sm btn-danger">Supprimer</button></a>  

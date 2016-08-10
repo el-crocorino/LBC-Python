@@ -144,6 +144,8 @@ def criteria_add(request, rummage_id):
 			criteria.name = name
 			criteria.weight = weight
 			criteria.save()
+			
+			updateRummagesScores(criteria.rummage_id)			
 
 			send = True
 
@@ -154,25 +156,22 @@ def criteria_add(request, rummage_id):
 
 def criteria_delete(request, criteria_id):
 
-	criteria = get_object_or_404(Criteria, id=criteria_id)
+	criteria = get_object_or_404(Criteria, id = criteria_id)
 	rummage_id = criteria.rummage_id
-	#notes = Notes.objects.filter(criteria_id=criteria.id)
+	notes = Note.objects.filter(criteria_id = criteria.id)
 
-	#for criteria_item in criteria_items:
-		#criteria_item.delete();
-	# for note in notes:
-	# 	note.delete();
+	for note in notes:
+	 	note.delete();
 
 	criteria.delete();
+	updateRummagesScores(criteria.rummage_id)
 	
-	#return redirect('app:rummage_list', user_id=1)	
-	#return redirect('app:criteria_list', rummage_id=rummage_id)
 	return redirect('app:rummage', rummage_id=rummage_id)	
 
 def criteria_update(request, criteria_id):
 
-	criteria = get_object_or_404(Criteria, id=criteria_id)
-	rummage = Rummage.objects.get(id=criteria.rummage_id)
+	criteria = get_object_or_404(Criteria, id = criteria_id)
+	rummage = Rummage.objects.get(id = criteria.rummage_id)
 	#rummage_id = criteria.rummage_id
 
 	if request.method == 'POST':
@@ -188,6 +187,8 @@ def criteria_update(request, criteria_id):
 			criteria.weight = weight
 			criteria.updated_date = datetime.now()
 			criteria.save()
+			
+			updateRummagesScores(criteria.rummage_id)
 
 			send = True
 
@@ -353,7 +354,7 @@ def note_add(request, rummageItemId):
 				
 				noteQuery = Note.objects.filter(rummage_item_id = rummageItemId).filter(criteria_id = key)				
 				
-				if( noteQuery != None): 
+				if( len(noteQuery) != 0 ): 
 					note = noteQuery[0]
 				else:
 					note = Note();
@@ -364,13 +365,20 @@ def note_add(request, rummageItemId):
 				note.note = float(value[0])
 				note.updated_date = datetime.now()
 				
-				note.save()				
+				note.save()	
+								
+	rummage = Rummage.objects.get(id = rummageItem.rummage_id)
+	criterias = Criteria.objects.filter(rummage_id = rummageItem.rummage_id)
+	
+	rummageItem.score = getScore(rummage, criterias, rummageItem)
+	rummageItem.updated_date = datetime.now()
+	rummageItem.save()
 		
 	context = {
 	        'rummageItemId':rummageItemId,
 	        'rummageItem':rummageItem,
-	        'rummage' : Rummage.objects.get(id = rummageItem.rummage_id),
-	        'criterias' : Criteria.objects.filter(rummage_id = rummageItem.rummage_id),
+	        'rummage' : rummage,
+	        'criterias' : criterias,
 	        'notes_list' : getNotesList(rummageItemId),        
 	}
 		
@@ -465,6 +473,7 @@ def getSavedAdsList(rummage):
 		        'url' : item.url,
 		        'infos' : item.infos,
 		        'price' : item.price,
+		        'score' : item.score,
 		        'thumbnail_url' : item.thumbnail_url,
 		        'updated_date' : item.updated_date,
 		}	
@@ -509,3 +518,31 @@ def getNotesList(rummageItemId):
 		notesList[note.criteria_id] = note.note
 
 	return notesList
+
+def getScore(rummage, criterias, rummageItem):
+		
+	notes = Note.objects.filter(rummage_item_id = rummageItem.id)	
+	score = 0.00
+	
+	if( len(notes) >0):
+		for note in notes:
+			for criteria in criterias:
+				if (note.criteria_id == criteria.id):
+					score += float(note.note) * float(criteria.weight)
+	
+	return score
+	
+def updateRummagesScores(rummageId):
+		
+	rummage = get_object_or_404(Rummage, id = rummageId)	
+	rummageItems = Rummage_item.objects.filter(rummage_id = rummageId)	
+	criterias = Criteria.objects.filter(rummage_id = rummageId)
+	
+	for rummageItem in rummageItems:
+		rummageItem.score = getScore(rummage, criterias, rummageItem)
+		rummageItem.updated_date = datetime.now()
+		rummageItem.save()	
+		
+	
+	
+		

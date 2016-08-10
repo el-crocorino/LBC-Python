@@ -29,6 +29,7 @@ class Rummage_item(models.Model):
     thumbnail_url = models.TextField(null=True)
     price = models.FloatField(null=True)
     infos = models.TextField(null=True)
+    score = models.FloatField(null=False, default=0.0)
     created_date = models.DateTimeField(auto_now_add=True, auto_now= False, verbose_name="Creation date")
     updated_date = models.DateTimeField(auto_now_add=True, auto_now= False, verbose_name="Update date")
     
