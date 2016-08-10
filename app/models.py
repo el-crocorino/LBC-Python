@@ -39,7 +39,7 @@ class Rummage_item(models.Model):
 class Note(models.Model):
     rummage_item = models.ForeignKey('rummage_item', on_delete=models.CASCADE)
     criteria = models.ForeignKey('criteria', on_delete=models.CASCADE)
-    note = models.TextField(null=True)
+    note = models.FloatField(null=False, default=0.0)
     created_date = models.DateTimeField(auto_now_add=True, auto_now= False, verbose_name="Creation date")
     updated_date = models.DateTimeField(auto_now_add=True, auto_now= False, verbose_name="Update date")
     

@@ -40,15 +40,15 @@ class NoteAddForm (ModelForm):
 
     class Meta:
         model = Note
-        fields = ['note']        
-        #exclude = ( 'created_date','updated_date')  
-        #labels = {
-            #"note": "Note :"
-        #}        
-        #widgets = {
-            #'note': widgets.NumberInput( attrs = {
-                #'step' : '0.01',
-                #'min' : '0.0',
-                #'max' : '5.0',
-            #})
-        #}    
+        fields = ['note'] 
+        labels = {
+                    "note": "Note :",
+                }        
+        widgets = {
+            'note': widgets.NumberInput( attrs = {
+                'step' : '0.01',
+                'min' : '0.0',
+                'max' : '5.0',
+            })
+        }        
+        #exclude = ( 'created_date','updated_date')    

@@ -349,7 +349,7 @@ def note_add(request, rummageItemId):
 	
 		#if( form.is_valid()):
 		for key, value in form.data.items():
-
+			
 			if( key != 'csrfmiddlewaretoken'):
 				
 				noteQuery = Note.objects.filter(rummage_item_id = rummageItemId).filter(criteria_id = key)				
@@ -362,7 +362,7 @@ def note_add(request, rummageItemId):
 				
 				note.criteria_id = int(key)
 				note.rummage_item_id = rummageItemId
-				note.note = float(value[0])
+				note.note = float(value)				
 				note.updated_date = datetime.now()
 				
 				note.save()	
