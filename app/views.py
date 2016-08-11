@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.http import HttpResponse, Http404
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from datetime import datetime
 from app.models import Rummage, Criteria, Rummage_item, Note
@@ -12,6 +13,29 @@ def home(request):
 	}
 	
 	return render(request, 'app/index.html', context)
+
+def login(request):	
+	
+	logged_in = False
+	username = request.POST['username']
+	password = request.POST['password']
+	user = authenticate(username = username, password = password)
+	
+	if user is not None:
+		
+		if user.is_active:
+			login(request, user)
+			logged = True
+			# Redirect to a success page.
+		else:
+			# Return a 'disabled account' error message
+			pass
+			
+	else:
+		# Return an 'invalid login' error message.
+		pass
+		
+	return render(request, 'app/index.html', locals())
 
 def rummage(request, rummage_id):		
 	
@@ -274,11 +298,11 @@ def rummage_item_add(request, rummage_id):
 def rummage_item_delete(request, rummageItemId):
 	
 	rummageItem = get_object_or_404(Rummage_item, id = rummageItemId)
-	#notes = Rummage_item.objects.filter(rummage_item_id = rummageItemId)
+	notes = Note.objects.filter(rummage_item_id = rummageItemId)
 	rummageId = rummageItem.rummage_id
 	
-	#for note in notes:
-		#note.delete()
+	for note in notes:
+		note.delete()
 		
 	rummageItem.delete()
 	
