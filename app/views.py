@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404, get_list_or_40
 from django.http import HttpResponse, Http404
 from django.contrib.auth.models import User
 from datetime import datetime
-from app.models import Rummage, Criteria, Rummage_item
+from app.models import Rummage, Criteria, Rummage_item, Note
 from urllib.parse import urlparse
 
 def home(request):	
@@ -132,7 +132,7 @@ def criteria_add(request, rummage_id):
 
 	if request.method == 'POST':
 
-		form = CriteriaAddForm(request.POST)
+		form = CriteriaAddForm(request.POST, initial={"id_rummage": rummage_id})
 
 		if( form.is_valid()):
 
@@ -144,35 +144,34 @@ def criteria_add(request, rummage_id):
 			criteria.name = name
 			criteria.weight = weight
 			criteria.save()
+			
+			updateRummagesScores(criteria.rummage_id)			
 
 			send = True
 
 	else :
-		form = CriteriaAddForm()
+		form = CriteriaAddForm(initial={"id_rummage": rummage_id})
 
 	return render(request, 'app/criteria_add.html', locals())
 
 def criteria_delete(request, criteria_id):
 
-	criteria = get_object_or_404(Criteria, id=criteria_id)
+	criteria = get_object_or_404(Criteria, id = criteria_id)
 	rummage_id = criteria.rummage_id
-	#notes = Notes.objects.filter(criteria_id=criteria.id)
+	notes = Note.objects.filter(criteria_id = criteria.id)
 
-	#for criteria_item in criteria_items:
-		#criteria_item.delete();
-	# for note in notes:
-	# 	note.delete();
+	for note in notes:
+	 	note.delete();
 
 	criteria.delete();
+	updateRummagesScores(criteria.rummage_id)
 	
-	#return redirect('app:rummage_list', user_id=1)	
-	#return redirect('app:criteria_list', rummage_id=rummage_id)
 	return redirect('app:rummage', rummage_id=rummage_id)	
 
 def criteria_update(request, criteria_id):
 
-	criteria = get_object_or_404(Criteria, id=criteria_id)
-	rummage = Rummage.objects.get(id=criteria.rummage_id)
+	criteria = get_object_or_404(Criteria, id = criteria_id)
+	rummage = Rummage.objects.get(id = criteria.rummage_id)
 	#rummage_id = criteria.rummage_id
 
 	if request.method == 'POST':
@@ -188,6 +187,8 @@ def criteria_update(request, criteria_id):
 			criteria.weight = weight
 			criteria.updated_date = datetime.now()
 			criteria.save()
+			
+			updateRummagesScores(criteria.rummage_id)
 
 			send = True
 
@@ -212,30 +213,32 @@ def criteria_list(request, user_id):
 def rummage_item(request, rummageItemId):
 	
 	rummageItem = get_object_or_404(Rummage_item, id = rummageItemId)
-	criterias = Criteria.objects.filter(rummage_id = rummageItem.rummage_id)		
-	
+	rummage = Rummage.objects.filter(id = rummageItem.rummage_id)[0]
+	criterias = Criteria.objects.filter(rummage_id = rummageItem.rummage_id)	
+	notes_list = getNotesList(rummageItemId)
+
 	context = {
 	        'rummageItem':rummageItem, 
+	        'rummage' : rummage,
 	        'criterias':criterias,
+	        'notes_list' : notes_list,
 	}
 	
-	return render(request, 'app/rummage.html', context)
+	return render(request, 'app/rummage_item.html', context)
 
 from app.forms import Rummage_itemAddForm
 
 def rummage_item_add(request, rummage_id):
+			
+	rummage = get_object_or_404(Rummage, id = rummage_id)
 	
 	if request.method == 'POST':
 	
 		form = Rummage_itemAddForm(request.POST)
 		price = float(form.data['price'][:-2])
 		price *= 10
-		print(price)
-		print(price * 10)
 		
-		if( form.is_valid()):	
-					
-			rummage = get_object_or_404(Rummage, id = form.data['rummage_id'])
+		if( form.is_valid()):						
 			
 			rummage_item = Rummage_item()
 			rummage_item.rummage = rummage
@@ -334,6 +337,53 @@ def rummage_item_list(request, user_id):
 	
 	return render(request, 'app/index.html', context)
 
+from app.forms import NoteAddForm
+
+def note_add(request, rummageItemId):
+	
+	rummageItem = get_object_or_404(Rummage_item, id = rummageItemId)
+
+	if request.method == 'POST':
+
+		form = NoteAddForm(request.POST, initial={"rummage_item_id": rummageItemId})
+	
+		#if( form.is_valid()):
+		for key, value in form.data.items():
+			
+			if( key != 'csrfmiddlewaretoken'):
+				
+				noteQuery = Note.objects.filter(rummage_item_id = rummageItemId).filter(criteria_id = key)				
+				
+				if( len(noteQuery) != 0 ): 
+					note = noteQuery[0]
+				else:
+					note = Note();
+					note.created_date = datetime.now()
+				
+				note.criteria_id = int(key)
+				note.rummage_item_id = rummageItemId
+				note.note = float(value)				
+				note.updated_date = datetime.now()
+				
+				note.save()	
+								
+	rummage = Rummage.objects.get(id = rummageItem.rummage_id)
+	criterias = Criteria.objects.filter(rummage_id = rummageItem.rummage_id)
+	
+	rummageItem.score = getScore(rummage, criterias, rummageItem)
+	rummageItem.updated_date = datetime.now()
+	rummageItem.save()
+		
+	context = {
+	        'rummageItemId':rummageItemId,
+	        'rummageItem':rummageItem,
+	        'rummage' : rummage,
+	        'criterias' : criterias,
+	        'notes_list' : getNotesList(rummageItemId),        
+	}
+		
+	return render(request, 'app/rummage_item.html', context)	
+
 def article_view(request, article_id):
 	"""Displays article with given id"""
 	
@@ -373,10 +423,10 @@ def getAdsList(rummage):
 
 	ads_list = {}		
 
-	#import codecs
-	#page = codecs.open('/media/Docs/DEV/LBC/Examples/liste.html', 'r', 'windows-1252').read()
+	import codecs
+	page = codecs.open('/media/Docs/DEV/LBC/Examples/liste.html', 'r', 'windows-1252').read()
 
-	page = urlopen(rummage.url).read()
+	#page = urlopen(rummage.url).read()
 	soup = BeautifulSoup(page)
 	soup.prettify()
 	
@@ -388,13 +438,14 @@ def getAdsList(rummage):
 
 		if anchor_class != None and 'list_item' in anchor_class:
 
-			item_price = anchor.find_all('h3', 'item_price')[0].contents[0];
-
-			item_image_container = anchor.find_all('span', class_='item_imagePic')[0].contents
-			ad_image_href = 'https:' + item_image_container[1].get('data-imgsrc')			
-
+			item_price = anchor.find_all('h3', 'item_price')[0].contents[0]
+			item_image_container = anchor.find_all('span', class_='item_imagePic')[0].contents						
+			ad_image_href = 'https:'
+			
+			if (item_image_container != ['\n']): 
+				ad_image_href += item_image_container[1].get('data-imgsrc')			
+				
 			item_infos = json.loads(anchor['data-info'])
-
 			adlist_id = item_infos.get('ad_listid')
 			
 			if( adlist_id != None and int(adlist_id) not in savedAdsIdList):
@@ -422,6 +473,7 @@ def getSavedAdsList(rummage):
 		        'url' : item.url,
 		        'infos' : item.infos,
 		        'price' : item.price,
+		        'score' : item.score,
 		        'thumbnail_url' : item.thumbnail_url,
 		        'updated_date' : item.updated_date,
 		}	
@@ -456,3 +508,41 @@ def getRummageQueryInformations(rummage) :
 		query['city'] = path_components[3]
 		
 	return query
+
+def getNotesList(rummageItemId):
+	
+	notes = Note.objects.filter(rummage_item_id = rummageItemId)	
+	notesList = {}
+	
+	for note  in notes:
+		notesList[note.criteria_id] = note.note
+
+	return notesList
+
+def getScore(rummage, criterias, rummageItem):
+		
+	notes = Note.objects.filter(rummage_item_id = rummageItem.id)	
+	score = 0.00
+	
+	if( len(notes) >0):
+		for note in notes:
+			for criteria in criterias:
+				if (note.criteria_id == criteria.id):
+					score += float(note.note) * float(criteria.weight)
+	
+	return score
+	
+def updateRummagesScores(rummageId):
+		
+	rummage = get_object_or_404(Rummage, id = rummageId)	
+	rummageItems = Rummage_item.objects.filter(rummage_id = rummageId)	
+	criterias = Criteria.objects.filter(rummage_id = rummageId)
+	
+	for rummageItem in rummageItems:
+		rummageItem.score = getScore(rummage, criterias, rummageItem)
+		rummageItem.updated_date = datetime.now()
+		rummageItem.save()	
+		
+	
+	
+		
