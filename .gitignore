@@ -1,2 +1,10 @@
-/*.pyc
+*.log
+*.pot
+*.pyc
 __pycache__/
+local_settings.py
+*.sqlite3
+media
+LBC/bin/
+LBC/include/
+LBC/lib/

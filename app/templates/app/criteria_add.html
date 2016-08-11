@@ -1,0 +1,28 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block title %}Ajouter un critère{% endblock %}
+
+{% block content %}
+
+	<div class="jumbotron">
+		<h1>Ajouter un critère</h1>
+		<p>Vous pouvez ajouter un critère à une recherche afin de vous aider à évaluer celle-ci en fonction de vos besoins.</p>
+	</div>
+
+	<div class="page-header">
+		<h1>Nouveau critère</h1>
+	</div>
+
+	<div class="row">
+    	<div class="col-md-12">
+			{% if send %}
+				<div class="alert alert-success" role="alert">Votre critère a bien été enregistré.</div>
+			{% endif %}			
+			<form action="{% url 'app:criteria_add' rummage.id %}" method="post">{% csrf_token %}
+				{{ form.as_p }}
+				<input type="submit" value="Ajouter" />
+			</form>
+		</div>
+
+{% endblock %}

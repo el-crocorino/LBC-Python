@@ -1,0 +1,42 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block title %}Liste des recherches en cours{% endblock %}
+
+{% block content %}
+
+	<div class="jumbotron">
+		<h1>Mes recherches</h1>
+		<p>Vous pouvez consulter ici les recherches effectuées sur le bon coin que vous avez sauvegardées dans l'application.</p>
+	</div>
+
+	<div class="page-header">
+		<h1>Recherches en cours</h1>
+	</div>
+
+	<div class="row">
+    	<div class="col-md-12">
+    		<table class="table table-striped table-condensed">
+            <tbody>
+				{% for rummage in rummages_list %}
+	            	<tr>
+	                	<td>
+	                		<a href="{% url 'app:rummage' rummage.id %}">{{ rummage.title }}</a>
+	                	</td>
+	                	<td align="right">
+	                		<a href="{% url 'app:rummage_update' rummage.id %}"><button type="button" class="btn btn-sm btn-default">Éditer</button></a>
+	                		<a href="{% url 'app:rummage_delete' rummage.id %}"><button type="button" class="btn btn-sm btn-danger">Supprimer</button></a>        
+	                	</td>
+	            	</tr>
+				{% empty %}
+	            	<tr>
+	                	<td>Aucune recherche en cours</td>
+	            	</tr>
+				{% endfor %}
+	            </tbody>
+            </table>
+    		<a href="{% url 'app:rummage_add' %}"><button type="button" class="btn btn-sm btn-default">Nouvelle recherche</button></a>
+    	</div>
+    </div>
+
+{% endblock %}
