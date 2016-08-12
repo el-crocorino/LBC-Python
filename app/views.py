@@ -1,13 +1,21 @@
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.http import HttpResponse, Http404
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.models import User
 from datetime import datetime
 from app.models import Rummage, Criteria, Rummage_item, Note
 from urllib.parse import urlparse
 
 def home(request):	
-	rummages = Rummage.objects.all()
+	
+	rummages = []
+	
+	if request.user.is_authenticated():
+		current_user = request.user
+		print(current_user.id)
+		rummages = Rummage.objects.filter(user_id = current_user.id)
+		print(rummages)
+		
 	context = {
 	        'rummages_list':rummages
 	}
@@ -16,27 +24,41 @@ def home(request):
 
 def login(request):	
 	
-	logged_in = False
-	username = request.POST['username']
-	password = request.POST['password']
-	user = authenticate(username = username, password = password)
+	if request.method == 'POST':
 	
-	if user is not None:
-		
-		if user.is_active:
-			login(request, user)
-			logged = True
-			# Redirect to a success page.
-		else:
-			# Return a 'disabled account' error message
-			pass
+		#form = RummageAddForm(request.POST)
 			
-	else:
-		# Return an 'invalid login' error message.
-		pass
-		
-	return render(request, 'app/index.html', locals())
-
+		#if( form.is_valid()):
+			logged_in = False
+			userUsername = request.POST['inputUsername']
+			password = request.POST['inputPassword']
+			user = authenticate(username = userUsername, password = password)
+				
+			if user is not None:
+			
+				if user.is_active:
+					auth_login(request, user)
+					logged = True					
+					
+					return render(request, 'app/index.html')
+					# Redirect to a success page.
+				else:
+					print("Inactive User")
+					# Return a 'disabled account' error message
+					return render(request, 'app/login.html')
+			
+			else:
+				print("No User")
+				# Return an 'invalid login' error message.
+				return render(request, 'app/login.html')	
+				
+				
+		#else :
+			#form = RummageAddForm()
+			
+	else : 
+		return render(request, 'app/login.html')
+	
 def rummage(request, rummage_id):		
 	
 	rummage = get_object_or_404(Rummage, id = rummage_id)
@@ -447,10 +469,10 @@ def getAdsList(rummage):
 
 	ads_list = {}		
 
-	import codecs
-	page = codecs.open('/media/Docs/DEV/LBC/Examples/liste.html', 'r', 'windows-1252').read()
+	#import codecs
+	#page = codecs.open('/media/Docs/DEV/LBC/Examples/liste.html', 'r', 'windows-1252').read()
 
-	#page = urlopen(rummage.url).read()
+	page = urlopen(rummage.url).read()
 	soup = BeautifulSoup(page)
 	soup.prettify()
 	

@@ -34,7 +34,7 @@
 						<ul class="nav navbar-nav">
 							<li><a href="/blog">Blog</a></li>
 							<li><a href="/app" class="active">Application</a></li>
-							<li><a href="/login/">Connexion</a></li>
+							<li><a href="{% url 'app:login' %}">Connexion</a></li>
 							<li><a href="{% url 'app:rummage_list' 1 %}">Mes Recherches</a></li>
 							<!-- <li class="dropdown">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
