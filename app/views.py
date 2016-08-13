@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.http import HttpResponse, Http404
-from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.models import User
 from datetime import datetime
 from app.models import Rummage, Criteria, Rummage_item, Note
@@ -8,19 +8,10 @@ from urllib.parse import urlparse
 
 def home(request):	
 	
-	rummages = []
-	
 	if request.user.is_authenticated():
-		current_user = request.user
-		print(current_user.id)
-		rummages = Rummage.objects.filter(user_id = current_user.id)
-		print(rummages)
-		
-	context = {
-	        'rummages_list':rummages
-	}
-	
-	return render(request, 'app/index.html', context)
+		return redirect('app:rummage_list')
+	else:
+		return redirect('app:login')
 
 def login(request):	
 	
@@ -38,9 +29,9 @@ def login(request):
 			
 				if user.is_active:
 					auth_login(request, user)
-					logged = True					
+					logged = True	
 					
-					return render(request, 'app/index.html')
+					return redirect('app:rummage_list')			
 					# Redirect to a success page.
 				else:
 					print("Inactive User")
@@ -57,7 +48,14 @@ def login(request):
 			#form = RummageAddForm()
 			
 	else : 
-		return render(request, 'app/login.html')
+		if request.user.is_authenticated():
+			return redirect('app:rummage_list', request.user.id)			
+		else :
+			return render(request, 'app/login.html')
+
+def logout(request):	
+	auth_logout(request)
+	return redirect('app:home')
 	
 def rummage(request, rummage_id):		
 	
@@ -150,14 +148,20 @@ def rummage_update(request, rummage_id):
 	return render(request, 'app/rummage_update.html', locals())
 	
 
-def rummage_list(request, user_id):
+def rummage_list(request):
 	
-	rummages = Rummage.objects.all()
-	context = {
-	        'rummages_list':rummages
-	}
+	if request.user.is_authenticated():
+		
+		current_user = request.user
+		rummages = Rummage.objects.filter(user_id = current_user.id)	
+		
+		context = {
+			'rummages_list':rummages
+		}		
 	
-	return render(request, 'app/index.html', context)
+		return render(request, 'app/index.html', context)
+	else : 
+		return redirect('app:login')
 
 
 def criteria(request, criteria_id):	

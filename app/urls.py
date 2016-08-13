@@ -8,11 +8,12 @@ urlpatterns = [
     url(r'^$', app.views.home, name='index'),
     url(r'^accueil/$', app.views.home, name='home'),
     url(r'^login/$', app.views.login, name='login'),
+    url(r'^logout/$', app.views.logout, name='logout'),
     url(r'^article/(?P<article_id>\d+)/$', app.views.article_view, name='article_view'),
     url(r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/$', app.views.home, name='article_list'),
     
     url(r'^rummage/(?P<rummage_id>\d+)/$', app.views.rummage, name='rummage'),
-    url(r'^rummage_list/(?P<user_id>\d+)/$', app.views.rummage_list, name='rummage_list'),
+    url(r'^rummage_list/$', app.views.rummage_list, name='rummage_list'),
     url(r'^rummage_add/$', app.views.rummage_add, name='rummage_add'),
     url(r'^rummage_delete/(?P<rummage_id>\d+)/$', app.views.rummage_delete, name='rummage_delete'),
     url(r'^rummage_update/(?P<rummage_id>\d+)/$', app.views.rummage_update, name='rummage_update'),
