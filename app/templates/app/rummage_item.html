@@ -12,59 +12,62 @@
 
 	<div class="page-header">
 		<div class="row">
-    		<div class="col-md-9">
+			<div class="col-md-9">
 				<a href="{{ rummageItem.url }}"><h1>{{ rummageItem.name }} - {{ rummageItem.price }}</h1></a>  			
-    		</div>
-    		<div class="rummage-title-actions col-md-3">		
+			</div>
+			<div class="rummage-title-actions col-md-3">		
 				<a href="{% url 'app:rummage_item_delete' rummageItem.id %}"><button type="button" class="btn btn-sm btn-danger">Supprimer</button></a>   
-    		</div>
+			</div>
 		</div> 
 	</div>
 	
 	<h2>Critères</h2>
 
 	<div class="row">
-    	<div class="col-md-12">
-    		<form action="{% url 'app:note_add' rummageItem.id %}" method="POST">
-    		{% csrf_token %}
-    			<table class="table table-striped table-condensed">
-		            <thead>
-		              <tr>
-		                <th>Poids</th>
-		                <th colspan="2">Valeur</th>
-		              </tr>
-		            </thead>
-		            <tbody>
+		<div class="col-md-6">
+			<form action="{% url 'app:note_add' rummageItem.id %}" method="POST">
+			{% csrf_token %}
+				<table class="table table-striped table-condensed">
+					<thead>
+					 	<tr>
+						<th>Poids</th>
+						<th colspan="2">Valeur</th>
+					  </tr>
+					</thead>
+					<tbody>
 						{% for criteria in criterias %}
-			            	<tr>
-			                	<td width="20%">
-			                		{{ criteria.weight }}
-			                	</td>
-			                	<td width="40%">
+							<tr>
+								<td width="20%">
+									{{ criteria.weight }}
+								</td>
+								<td width="40%">
 									<label for="amount_{{ criteria.id }}">{{ criteria.name }} : </label>
 									<span id="label_amount_{{ criteria.id }}" style="border:0; color:#f6931f; font-weight:bold;"></span>
 									<input type="text" name="{{ criteria.id }}" id="amount_{{ criteria.id }}" readonly style="border:0; color:#f6931f; font-weight:bold; display:none;" value="{%for criteria_id, criteria_note in notes_list.items %}{% if criteria_id == criteria.id %}{{ criteria_note }}{% endif %}{% empty %}0.0{% endfor %}"> 
-			                	</td>
-			                	<td width="40%">  										
+								</td>
+								<td width="40%">  										
 									<div id="slider_{{ criteria.id }}"></div>
-			                	</td>
-			            	</tr>
+								</td>
+							</tr>
 						{% empty %}
-			            	<tr>
-			                	<td>Aucun critère définis pour cette recherche</td>
-			            	</tr>
+							<tr>
+								<td>Aucun critère définis pour cette recherche</td>
+							</tr>
 						{% endfor %}
 						<tr>
 							<td colspan="3" align="right">
 								<input type="submit" value="Enregistrer">
 							</td>
 						</tr>
-		            </tbody>
-	            </table>
-            </form>
-    		<a href="{% url 'app:criteria_add' rummage.id %}"><button type="button" class="btn btn-sm btn-default">Ajouter un critère d'évaluation</button></a>    
-    	</div>
-    </div>
+					</tbody>
+				</table>
+			</form>
+			<a href="{% url 'app:criteria_add' rummage.id %}"><button type="button" class="btn btn-sm btn-default">Ajouter un critère d'évaluation</button></a>	
+		</div>
+		<div class="col-md-6">
+			<div id="highcharts_container"></div>
+		</div>
+	</div>
 
 </div>
 
@@ -73,6 +76,10 @@
 
 
 {% block custom_scripts %}
+
+		<script src="{% static 'app/js/highcharts.js' %}"></script>
+		<script src="{% static 'app/js/highcharts-more.js' %}"></script>
+
 	<script  type="text/javascript">
 		$( function() {
 
@@ -95,7 +102,61 @@
 			{% empty %}
 			{% endfor %}
 
+			$('#highcharts_container').highcharts({
+
+				chart: {
+            		renderTo: 'highcharts_container',
+					polar: true,
+					type: 'line'
+				},
+
+				title: {
+					text: '',
+					x: -80,
+				},
+
+				pane: {
+					size: '80%'
+				},
+
+				xAxis: {
+
+					categories: [
+					{% for criteria in criterias %}
+						'{{ criteria.name }}',
+					{% empty %}
+					{% endfor %}],
+					tickmarkPlacement: 'off',
+					lineWidth: 0
+				},
+
+				yAxis: {
+					gridLineInterpolation: 'polygon',
+					lineWidth: 0,
+					min: 0,
+					max : 5,
+				},
+
+				series: [{
+					type: 'area',
+					name: '{{ rummageItem.name }}',
+					data: [
+					{% for criteria in criterias %}
+						{%for criteria_id, criteria_note in notes_list.items %}
+							{% if criteria_id == criteria.id %}
+								{{ criteria_note }},
+							{% endif %}
+						{% empty %}0.0
+						{% endfor %},
+					{% empty %}
+					{% endfor %}],
+					pointPlacement: 'on'
+				}, ]
+
+			});
+
 		} );
+
 	</script>
 {% endblock %}
 
