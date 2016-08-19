@@ -28,14 +28,14 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = (
+    'blog',
+    'app',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'blog',
-    'app',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -90,10 +90,6 @@ ADMINS =[
 	['Olivier Wenzek', 'owenzek@gmail.com'],
 	]
 
-# Templates
-#TEMPLATE_DIRS = [
-#	os.path.join(BASE_DIR, 'templates')
-#	]
 
 TEMPLATES = [
     {
@@ -111,3 +107,7 @@ TEMPLATES = [
 
 # Ajout d'un slash en fin d'URL
 APPEND_SLASH = True
+
+#Login UrL
+LOGIN_REDIRECT_URL = '/app/accueil/'
+#LOGOUT_REDIRECT_URL = '/app/accueil/'

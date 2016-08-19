@@ -36,9 +36,9 @@
 							<li><a href="{% url 'app:rummage_list' %}" class="active">Application</a></li>
 							<li>
 								{% if user.is_authenticated %}
-									<a href="{% url 'logout' %}">Déconnexion</a>
+									<a href="{% url 'app:logout' %}">Déconnexion</a>
 								{% else %}
-									<a href="{% url 'login' %}">Connexion</a>
+									<a href="{% url 'app:login' %}">Connexion</a>
 								{% endif %}
 							</li>
 							<!-- <li class="dropdown">

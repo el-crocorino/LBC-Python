@@ -2,6 +2,7 @@
 
 from django import forms
 from django.forms import ModelForm, widgets
+from django.contrib.auth.models import User
 from app.models import Rummage, Criteria, Rummage_item, Note
 
 class RummageAddForm (forms.Form):
@@ -52,3 +53,26 @@ class NoteAddForm (ModelForm):
             })
         }        
         #exclude = ( 'created_date','updated_date')    
+        
+        from django.contrib.auth.models import User
+        from django.utils.translation import ugettext_lazy as _
+        
+class RegistrationForm(forms.Form):
+        
+    username = forms.RegexField(regex=r'^\w+$', widget=forms.TextInput(attrs=dict(required=True, max_length=30)), label=u"Nom d'utilisateur", error_messages={ 'invalid': u"Votre nom d'utilisateur ne doit contenir que des chiffres, des lettres ou des tirets bas" })
+    email = forms.EmailField(widget=forms.TextInput(attrs=dict(required=True, max_length=30)), label=u"Email")
+    password1 = forms.CharField(widget=forms.PasswordInput(attrs=dict(required=True, max_length=30, render_value=False)), label=u"Mot de passe")
+    password2 = forms.CharField(widget=forms.PasswordInput(attrs=dict(required=True, max_length=30, render_value=False)), label=u"Vérification")
+        
+    def clean_username(self):
+        try:
+            user = User.objects.get(username__iexact=self.cleaned_data['username'])
+        except User.DoesNotExist:
+            return self.cleaned_data['username']
+        raise forms.ValidationError(u"Ce nom d'utilisateur existe déjà. Essayez-en un autre")
+        
+    def clean(self):
+        if 'password1' in self.cleaned_data and 'password2' in self.cleaned_data:
+            if self.cleaned_data['password1'] != self.cleaned_data['password2']:
+                raise forms.ValidationError(u"Les deux mots de passe ne correspondent pas.")
+        return self.cleaned_data        

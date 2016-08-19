@@ -1,18 +1,99 @@
-from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
-from django.http import HttpResponse, Http404
+from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404, render_to_response
+from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.template import RequestContext
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_protect
+
 from datetime import datetime
-from app.models import Rummage, Criteria, Rummage_item, Note
 from urllib.parse import urlparse
+from app.models import Rummage, Criteria, Rummage_item, Note
+from app.forms import RegistrationForm, RummageAddForm, CriteriaAddForm, Rummage_itemAddForm, NoteAddForm
 
+@login_required
 def home(request):	
-	rummages = Rummage.objects.all()
-	context = {
-	        'rummages_list':rummages
-	}
-	
-	return render(request, 'app/index.html', context)
+	return redirect('app:rummage_list')
 
+def login(request):	
+	
+	if request.method == 'POST':
+	
+		#form = RummageAddForm(request.POST)
+			
+		#if( form.is_valid()):
+			logged_in = False
+			userUsername = request.POST['inputUsername']
+			password = request.POST['inputPassword']
+			user = authenticate(username = userUsername, password = password)
+			
+			msg = []			
+				
+			if user is not None:
+			
+				if user.is_active:
+					auth_login(request, user)
+					logged = True	
+					msg.append({'alert-success' : "Login successful"})
+					#return redirect('app:rummage_list', {'errors': msg})
+					return redirect('app:rummage_list')			
+					# Redirect to a success page.
+				else:
+					print("Inactive User")
+					msg.append({'alert-error' : "Inactive User"})	
+					# Return a 'disabled account' error message
+					return render(request, 'app/login.html', {'errors': msg})
+			
+			else:
+				print("No User")
+				msg.append({'alert-error' : "No User"})
+				# Return an 'invalid login' error message.
+				return render(request, 'app/login.html', {'errors': msg})	
+				
+				
+		#else :
+			#form = RummageAddForm()
+			
+	else : 
+		if request.user.is_authenticated():
+			return redirect('app:rummage_list', request.user.id)			
+		else :
+			return render(request, 'app/login.html')
+
+def logout(request):	
+	auth_logout(request)
+	return redirect('app:home')
+
+
+@csrf_protect
+def register(request):
+	if request.method == 'POST':
+		form = RegistrationForm(request.POST)
+		if form.is_valid():
+			user = User.objects.create_user(
+			        username=form.cleaned_data['username'],
+			        password=form.cleaned_data['password1'],
+			        email=form.cleaned_data['email']
+			)
+			return HttpResponseRedirect('/accounts/register/success/')
+	else:
+		form = RegistrationForm()
+
+	variables = RequestContext(request, {
+	        'form': form
+	})
+
+	return render_to_response(
+	        'registration/register.html',
+	        variables,
+	)
+
+def register_success(request):
+	return render_to_response(
+	        'registration/register_success.html',
+	)
+
+@login_required
 def rummage(request, rummage_id):		
 	
 	rummage = get_object_or_404(Rummage, id = rummage_id)
@@ -31,8 +112,8 @@ def rummage(request, rummage_id):
 	
 	return render(request, 'app/rummage.html', context)
 
-from app.forms import RummageAddForm
 
+@login_required
 def rummage_add(request):
 	
 	if request.method == 'POST':
@@ -58,6 +139,8 @@ def rummage_add(request):
 		
 	return render(request, 'app/rummage_add.html', locals())
 
+
+@login_required
 def rummage_delete(request, rummage_id):
 	
 	rummage = get_object_or_404(Rummage, id=rummage_id)
@@ -73,6 +156,8 @@ def rummage_delete(request, rummage_id):
 	
 	return redirect('app:rummage_list', user_id=1)	
 
+
+@login_required
 def rummage_update(request, rummage_id):
 	
 	rummage = get_object_or_404(Rummage, id=rummage_id)
@@ -104,16 +189,20 @@ def rummage_update(request, rummage_id):
 	return render(request, 'app/rummage_update.html', locals())
 	
 
-def rummage_list(request, user_id):
+@login_required
+def rummage_list(request):
+		
+	current_user = request.user
+	rummages = Rummage.objects.filter(user_id = current_user.id)	
 	
-	rummages = Rummage.objects.all()
 	context = {
-	        'rummages_list':rummages
-	}
-	
+                'rummages_list':rummages
+        }		
+
 	return render(request, 'app/index.html', context)
 
 
+@login_required
 def criteria(request, criteria_id):	
 
 	criteria = get_object_or_404(Criteria, id=criteria_id)
@@ -124,8 +213,8 @@ def criteria(request, criteria_id):
 
 	return render(request, 'app/criteria.html', context)
 
-from app.forms import CriteriaAddForm
 
+@login_required
 def criteria_add(request, rummage_id):
 	
 	rummage = get_object_or_404(Rummage, id=rummage_id)
@@ -154,6 +243,8 @@ def criteria_add(request, rummage_id):
 
 	return render(request, 'app/criteria_add.html', locals())
 
+
+@login_required
 def criteria_delete(request, criteria_id):
 
 	criteria = get_object_or_404(Criteria, id = criteria_id)
@@ -168,6 +259,8 @@ def criteria_delete(request, criteria_id):
 	
 	return redirect('app:rummage', rummage_id=rummage_id)	
 
+
+@login_required
 def criteria_update(request, criteria_id):
 
 	criteria = get_object_or_404(Criteria, id = criteria_id)
@@ -202,6 +295,7 @@ def criteria_update(request, criteria_id):
 	return render(request, 'app/criteria_update.html', locals())
 	
 
+@login_required
 def criteria_list(request, user_id):
 	criterias = Criteria.objects.all()
 	context = {
@@ -210,6 +304,8 @@ def criteria_list(request, user_id):
 
 	return render(request, 'app:criteria_list', context)
 
+
+@login_required
 def rummage_item(request, rummageItemId):
 	
 	rummageItem = get_object_or_404(Rummage_item, id = rummageItemId)
@@ -226,8 +322,8 @@ def rummage_item(request, rummageItemId):
 	
 	return render(request, 'app/rummage_item.html', context)
 
-from app.forms import Rummage_itemAddForm
 
+@login_required
 def rummage_item_add(request, rummage_id):
 			
 	rummage = get_object_or_404(Rummage, id = rummage_id)
@@ -271,14 +367,16 @@ def rummage_item_add(request, rummage_id):
 	
 	return render(request, 'app/rummage.html', context)
 
+
+@login_required
 def rummage_item_delete(request, rummageItemId):
 	
 	rummageItem = get_object_or_404(Rummage_item, id = rummageItemId)
-	#notes = Rummage_item.objects.filter(rummage_item_id = rummageItemId)
+	notes = Note.objects.filter(rummage_item_id = rummageItemId)
 	rummageId = rummageItem.rummage_id
 	
-	#for note in notes:
-		#note.delete()
+	for note in notes:
+		note.delete()
 		
 	rummageItem.delete()
 	
@@ -298,6 +396,8 @@ def rummage_item_delete(request, rummageItemId):
 	
 	return render(request, 'app/rummage.html', context)	
 
+
+@login_required
 def rummage_item_update(request, rummage_id):
 	
 	rummage = get_object_or_404(Rummage, id=rummage_id)
@@ -328,6 +428,7 @@ def rummage_item_update(request, rummage_id):
 	return render(request, 'app/rummage_update.html', locals())
 	
 
+@login_required
 def rummage_item_list(request, user_id):
 	
 	rummages = Rummage.objects.all()
@@ -337,8 +438,8 @@ def rummage_item_list(request, user_id):
 	
 	return render(request, 'app/index.html', context)
 
-from app.forms import NoteAddForm
 
+@login_required
 def note_add(request, rummageItemId):
 	
 	rummageItem = get_object_or_404(Rummage_item, id = rummageItemId)
@@ -423,10 +524,10 @@ def getAdsList(rummage):
 
 	ads_list = {}		
 
-	import codecs
-	page = codecs.open('/media/Docs/DEV/LBC/Examples/liste.html', 'r', 'windows-1252').read()
+	#import codecs
+	#page = codecs.open('/media/Docs/DEV/LBC/Examples/liste.html', 'r', 'windows-1252').read()
 
-	#page = urlopen(rummage.url).read()
+	page = urlopen(rummage.url).read()
 	soup = BeautifulSoup(page)
 	soup.prettify()
 	
