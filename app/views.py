@@ -1,11 +1,15 @@
-from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
-from django.http import HttpResponse, Http404
+from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404, render_to_response
+from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.template import RequestContext
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_protect
+
 from datetime import datetime
-from app.models import Rummage, Criteria, Rummage_item, Note
 from urllib.parse import urlparse
+from app.models import Rummage, Criteria, Rummage_item, Note
+from app.forms import RegistrationForm, RummageAddForm, CriteriaAddForm, Rummage_itemAddForm, NoteAddForm
 
 @login_required
 def home(request):	
@@ -60,10 +64,35 @@ def logout(request):
 	auth_logout(request)
 	return redirect('app:home')
 
-def user_create(request):	
-	auth_logout(request)
-	return redirect('app:home')
-	
+
+@csrf_protect
+def register(request):
+	if request.method == 'POST':
+		form = RegistrationForm(request.POST)
+		if form.is_valid():
+			user = User.objects.create_user(
+			        username=form.cleaned_data['username'],
+			        password=form.cleaned_data['password1'],
+			        email=form.cleaned_data['email']
+			)
+			return HttpResponseRedirect('/accounts/register/success/')
+	else:
+		form = RegistrationForm()
+
+	variables = RequestContext(request, {
+	        'form': form
+	})
+
+	return render_to_response(
+	        'registration/register.html',
+	        variables,
+	)
+
+def register_success(request):
+	return render_to_response(
+	        'registration/register_success.html',
+	)
+
 @login_required
 def rummage(request, rummage_id):		
 	
@@ -83,7 +112,6 @@ def rummage(request, rummage_id):
 	
 	return render(request, 'app/rummage.html', context)
 
-from app.forms import RummageAddForm
 
 @login_required
 def rummage_add(request):
@@ -111,6 +139,7 @@ def rummage_add(request):
 		
 	return render(request, 'app/rummage_add.html', locals())
 
+
 @login_required
 def rummage_delete(request, rummage_id):
 	
@@ -126,6 +155,7 @@ def rummage_delete(request, rummage_id):
 	rummage.delete();
 	
 	return redirect('app:rummage_list', user_id=1)	
+
 
 @login_required
 def rummage_update(request, rummage_id):
@@ -158,6 +188,7 @@ def rummage_update(request, rummage_id):
 		
 	return render(request, 'app/rummage_update.html', locals())
 	
+
 @login_required
 def rummage_list(request):
 		
@@ -170,6 +201,7 @@ def rummage_list(request):
 
 	return render(request, 'app/index.html', context)
 
+
 @login_required
 def criteria(request, criteria_id):	
 
@@ -181,7 +213,6 @@ def criteria(request, criteria_id):
 
 	return render(request, 'app/criteria.html', context)
 
-from app.forms import CriteriaAddForm
 
 @login_required
 def criteria_add(request, rummage_id):
@@ -212,6 +243,7 @@ def criteria_add(request, rummage_id):
 
 	return render(request, 'app/criteria_add.html', locals())
 
+
 @login_required
 def criteria_delete(request, criteria_id):
 
@@ -226,6 +258,7 @@ def criteria_delete(request, criteria_id):
 	updateRummagesScores(criteria.rummage_id)
 	
 	return redirect('app:rummage', rummage_id=rummage_id)	
+
 
 @login_required
 def criteria_update(request, criteria_id):
@@ -261,6 +294,7 @@ def criteria_update(request, criteria_id):
 
 	return render(request, 'app/criteria_update.html', locals())
 	
+
 @login_required
 def criteria_list(request, user_id):
 	criterias = Criteria.objects.all()
@@ -269,6 +303,7 @@ def criteria_list(request, user_id):
 	}
 
 	return render(request, 'app:criteria_list', context)
+
 
 @login_required
 def rummage_item(request, rummageItemId):
@@ -287,7 +322,6 @@ def rummage_item(request, rummageItemId):
 	
 	return render(request, 'app/rummage_item.html', context)
 
-from app.forms import Rummage_itemAddForm
 
 @login_required
 def rummage_item_add(request, rummage_id):
@@ -333,6 +367,7 @@ def rummage_item_add(request, rummage_id):
 	
 	return render(request, 'app/rummage.html', context)
 
+
 @login_required
 def rummage_item_delete(request, rummageItemId):
 	
@@ -360,6 +395,7 @@ def rummage_item_delete(request, rummageItemId):
 	}
 	
 	return render(request, 'app/rummage.html', context)	
+
 
 @login_required
 def rummage_item_update(request, rummage_id):
@@ -391,6 +427,7 @@ def rummage_item_update(request, rummage_id):
 		
 	return render(request, 'app/rummage_update.html', locals())
 	
+
 @login_required
 def rummage_item_list(request, user_id):
 	
@@ -401,7 +438,6 @@ def rummage_item_list(request, user_id):
 	
 	return render(request, 'app/index.html', context)
 
-from app.forms import NoteAddForm
 
 @login_required
 def note_add(request, rummageItemId):
