@@ -122,12 +122,12 @@ def rummage_add(request):
 		
 		if( form.is_valid()):
 			
-			user_id = int(form.cleaned_data['user_id'])
+			current_user = request.user			
 			title = form.cleaned_data['title']
 			url = form.cleaned_data['url']
 						
 			rummage = Rummage()
-			rummage.user = User.objects.get(id=user_id)
+			rummage.user = User.objects.get(id=current_user.id)
 			rummage.title = title
 			rummage.url = url
 			rummage.save()
@@ -167,8 +167,7 @@ def rummage_update(request, rummage_id):
 		form = RummageAddForm(request.POST)
 		
 		if( form.is_valid()):
-			
-			user_id = int(form.cleaned_data['user_id'])
+				
 			title = form.cleaned_data['title']
 			url = form.cleaned_data['url']
 						
@@ -181,7 +180,6 @@ def rummage_update(request, rummage_id):
 			
 	else :
 		form = RummageAddForm({
-		      'user_id': rummage.user_id,
 		      'title': rummage.title,
 		      'url': rummage.url,
 		})
@@ -265,7 +263,6 @@ def criteria_update(request, criteria_id):
 
 	criteria = get_object_or_404(Criteria, id = criteria_id)
 	rummage = Rummage.objects.get(id = criteria.rummage_id)
-	#rummage_id = criteria.rummage_id
 
 	if request.method == 'POST':
 
@@ -522,7 +519,7 @@ def getAdsList(rummage):
 	from bs4 import BeautifulSoup	
 	import json		
 
-	ads_list = {}		
+	adsList = {}		
 
 	#import codecs
 	#page = codecs.open('/media/Docs/DEV/LBC/Examples/liste.html', 'r', 'windows-1252').read()
@@ -533,33 +530,26 @@ def getAdsList(rummage):
 	
 	savedAdsIdList = Rummage_item.objects.values_list('lbc_id', flat = True).filter(rummage_id = rummage.id)
 	
-	for anchor in soup.findAll('a', href=True):
+	for anchor in soup.findAll( 'a', href = True):
 
-		anchor_class = anchor.get('class')
+		anchorClass = anchor.get('class')
 
-		if anchor_class != None and 'list_item' in anchor_class:
-
-			item_price = anchor.find_all('h3', 'item_price')[0].contents[0]
-			item_image_container = anchor.find_all('span', class_='item_imagePic')[0].contents						
-			ad_image_href = 'https:'
+		if anchorClass != None and 'list_item' in anchorClass:
 			
-			if (item_image_container != ['\n']): 
-				ad_image_href += item_image_container[1].get('data-imgsrc')			
+			item = {}
+			
+			item['data_info'] = json.loads( anchor['data-info'])			
+			item['price'] = getAdPrice( anchor)					
+			item['type']= item['data_info'].get( 'ad_offres')
+			item['img_src'] = getAdImageUrl( anchor)
+			item['title'] = getAdTitle(anchor)		
+			item['listId'] = item['data_info'].get( 'ad_listid')
+			item['href'] = anchor['href']
+		
+			if( item['listId'] != None and int(item['listId']) not in savedAdsIdList):
+				adsList[item['listId']] = item
 				
-			item_infos = json.loads(anchor['data-info'])
-			adlist_id = item_infos.get('ad_listid')
-			
-			if( adlist_id != None and int(adlist_id) not in savedAdsIdList):
-								
-				ads_list[adlist_id] = {
-					'title' : anchor['title'],
-					'href' : anchor['href'],
-					'data_info' : anchor['data-info'],
-					'price' : item_price,
-					'img_src' : ad_image_href,
-				}
-
-	return ads_list
+	return adsList
 
 def getSavedAdsList(rummage):
 	
@@ -643,7 +633,44 @@ def updateRummagesScores(rummageId):
 		rummageItem.score = getScore(rummage, criterias, rummageItem)
 		rummageItem.updated_date = datetime.now()
 		rummageItem.save()	
+	
+def getAdImageUrl(anchor):
+	
+	itemImageContainer = anchor.find_all('span', class_='item_imagePic')[0].contents						
+	adImageHref = 'https:'	
+	itemImageContainer = list(filter(lambda x: x!= '\n', itemImageContainer))
+
+	if (len(itemImageContainer) > 0 and itemImageContainer != ['\n']):
+		print(itemImageContainer[0].name)
+		print(itemImageContainer[0])
+		if( itemImageContainer[0].name == 'img') :
+			adImageHref += itemImageContainer[0].get('src')
+		elif( itemImageContainer[0].name == 'span') : 
+			adImageHref += itemImageContainer[0].get('data-imgsrc')
+			
+	print(adImageHref)		        
+	return adImageHref
+
+def getAdPrice(anchor):
+	
+	itemPriceContainer = anchor.find_all('h3', 'item_price')
+	itemPrice = 0
+
+	if len(itemPriceContainer) > 0:
+		itemPrice = itemPriceContainer[0].contents[0]	
 		
-	
-	
+	return itemPrice
+
+def getAdTitle(anchor):
+		
+	itemTitleContainer = anchor.find_all('p', 'item_title')
+	itemTitle = ''
+
+	if len(itemTitleContainer) > 0:		
+		itemTitle = itemTitleContainer[0].contents[0]	
+	else :
+		itemTitle = anchor['title']
+		
+	return itemTitle
+
 		

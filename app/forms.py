@@ -6,7 +6,6 @@ from django.contrib.auth.models import User
 from app.models import Rummage, Criteria, Rummage_item, Note
 
 class RummageAddForm (forms.Form):
-    user_id = forms.CharField(max_length=10, label=u"Id utilisateur", required=True)
     title = forms.CharField(max_length=100, label=u"Nom :", required=True)
     url = forms.CharField(label=u"URL : ", help_text=u"Collez ici l'adresse de votre page de recherche", required=True)     
     
@@ -51,11 +50,10 @@ class NoteAddForm (ModelForm):
                 'min' : '0.0',
                 'max' : '5.0',
             })
-        }        
-        #exclude = ( 'created_date','updated_date')    
+        }         
         
-        from django.contrib.auth.models import User
-        from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth.models import User
+from django.utils.translation import ugettext_lazy as _
         
 class RegistrationForm(forms.Form):
         
