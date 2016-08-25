@@ -11,6 +11,10 @@ a {
 	height: 50px;
 }
 
+tr .rummage-item-pro {
+  background-color: #99ccff
+}
+
 /* Signin Form */
 
 .form-signin {
