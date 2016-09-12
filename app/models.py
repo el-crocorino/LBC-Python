@@ -3,11 +3,14 @@ from django.conf import settings
 
 from urllib.request import urlopen
 from urllib.parse import urlparse
+
 from bs4 import BeautifulSoup	
 import json
+import urllib.error
 
 class Rummage(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete = models.CASCADE)
     title = models.CharField(max_length=200)
     url = models.TextField()
     created_date = models.DateTimeField(auto_now_add=True, auto_now= False, verbose_name="Creation date")
@@ -35,8 +38,7 @@ class Rummage(models.Model):
     
             if anchorClass != None and 'list_item' in anchorClass:
     
-            # Todo : créer ici un objet rummage_item et le remplir, 
-            # déplacer les méthodes getAdPrice etc.. dans le modèle Rummage_item. 
+            # Todo : créer ici un objet rummage_item et le remplir,  
             # Implémenter une méthode toArray au model Rummage_item
     
                 item = {}
@@ -61,6 +63,15 @@ class Rummage(models.Model):
         savedAdsList = {}
     
         for item in rummageItemsList:
+            
+            disabled = False;   
+            
+            try:
+                req = urlopen('http:' + item.url)
+            except urllib.error.HTTPError as e:
+                if( e.code == '404'):
+                    disabled = True;
+                
             savedAdsList[str(item.lbc_id)] = {
                 'id' : item.id,
                 'name' : item.name,
@@ -68,6 +79,7 @@ class Rummage(models.Model):
                 'infos' : item.infos,
                 'price' : item.price,
                 'score' : item.score,
+                'disabled' : disabled,
                 'thumbnail_url' : item.thumbnail_url,
                 'updated_date' : item.updated_date,
             }	
@@ -201,6 +213,7 @@ class Rummage_item(models.Model):
         
     
 class Note(models.Model):
+    
     rummage_item = models.ForeignKey('rummage_item', on_delete=models.CASCADE)
     criteria = models.ForeignKey('criteria', on_delete=models.CASCADE)
     note = models.FloatField(null=False, default=0.0)

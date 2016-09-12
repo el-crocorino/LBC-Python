@@ -11,8 +11,12 @@ a {
 	height: 50px;
 }
 
-tr .rummage-item-pro {
-  background-color: #99ccff
+td.rummage-item-pro {
+  background-color: #cce6ff
+}
+
+td.rummage-item-disabled {
+  background-color: #ffb3b3
 }
 
 /* Signin Form */
