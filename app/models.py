@@ -69,9 +69,9 @@ class Rummage(models.Model):
             try:
                 req = urlopen('http:' + item.url)
             except urllib.error.HTTPError as e:
-                if( e.code == '404'):
+                if( e.code == 404):
                     disabled = True;
-                
+                    
             savedAdsList[str(item.lbc_id)] = {
                 'id' : item.id,
                 'name' : item.name,
@@ -83,7 +83,7 @@ class Rummage(models.Model):
                 'thumbnail_url' : item.thumbnail_url,
                 'updated_date' : item.updated_date,
             }	
-    
+            
         return savedAdsList
     
     

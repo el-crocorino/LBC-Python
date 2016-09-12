@@ -87,17 +87,18 @@
 			<table class="table table-striped table-condensed">
 				<tbody>
 					{% for ad_id, ad_infos in savedAdsList.items %}
-						<tr>
+						<tr
+							{% if ad_infos.disabled %}
+								class="rummage-item-disabled"
+							{% elif ad_infos.type == 'pro' %}
+								class="rummage-item-pro"
+							{% endif %}
+						>
 							<td>
 								<a href="{{ ad_infos.url }}"><img  class="rummage-item-thumbnail" src="{{ ad_infos.thumbnail_url }}" alt="{{ ad_infos.name }} image"></a>
 							</td>
 							<td>{{ ad_infos.type }}
 								<a href="{{ ad_infos.url }}">{{ ad_infos.name }} : {{ ad_infos.price }}</a>
-								{% if ad_infos.disabled %}
-										bgcolor="#99ccff" <!-- class="rummage-item-disabled" -->
-									{% elif ad_infos.type == 'pro' %}
-										bgcolor="#99ccff" <!-- class="rummage-item-pro" -->
-									{% endif %}
 							</td>
 							<td>
 								{{ ad_infos.updated_date }}
