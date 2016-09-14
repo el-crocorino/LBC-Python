@@ -12,7 +12,8 @@ class RummageAddForm (forms.Form):
     
 class CriteriaAddForm (ModelForm):
     
-    id_rummage = forms.CharField(widget = forms.HiddenInput())    
+    id_rummage = forms.CharField(widget = forms.HiddenInput())
+    criteriaId = forms.CharField(required = False, widget = forms.HiddenInput())    
 
     class Meta:
         model = Criteria
@@ -30,15 +31,15 @@ class CriteriaAddForm (ModelForm):
         }    
     
     def clean(self):
+        
         cleaned_data = super(CriteriaAddForm, self).clean()
         criterias = Criteria.objects.filter(rummage_id = cleaned_data.get('id_rummage'))
         
         criteriaWeightSum = 0;
     
         for criteria in criterias:
-            print(criteria.weight)
-            criteriaWeightSum += criteria.weight
-            print(criteriaWeightSum)
+            if( criteria.id != cleaned_data.get('criteriaId')):
+                criteriaWeightSum += criteria.weight
         
         criteriaWeightSum += cleaned_data.get('weight')
         
@@ -46,7 +47,7 @@ class CriteriaAddForm (ModelForm):
             raise forms.ValidationError(
                 _('La somme des poids de tous les critères ne doit pas être supérieur à 1: %(value)s'),
                 code='invalid',
-                params={'value': criteriaWeightSum},
+                params={'value': "{0:.2f}".format( round( criteriaWeightSum, 2))},
             )
 
   

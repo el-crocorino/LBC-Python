@@ -216,10 +216,14 @@ def criteria(request, criteria_id):
 def criteria_add(request, rummage_id):
 	
 	rummage = get_object_or_404(Rummage, id = rummage_id)
+	criterias = Criteria.objects.filter(rummage_id = rummage.id)
 
 	if request.method == 'POST':
-		print(request.POST)
-		form = CriteriaAddForm(request.POST, initial={"id_rummage": rummage_id})
+		
+		form = CriteriaAddForm(request.POST, initial={
+		        'id_rummage': rummage_id, 
+		        'criteriaId': '0',
+		})
 
 		if( form.is_valid()):
 
@@ -237,7 +241,10 @@ def criteria_add(request, rummage_id):
 			send = True
 
 	else :
-		form = CriteriaAddForm(initial={"id_rummage": rummage_id})
+		form = CriteriaAddForm(initial={
+		        'id_rummage': rummage_id, 
+		        'criteriaId': '0',
+		})
 
 	return render(request, 'app/criteria_add.html', locals())
 
@@ -266,8 +273,11 @@ def criteria_update(request, criteria_id):
 	
 	if request.method == 'POST':
 
-		form = CriteriaAddForm(request.POST)
-
+		form = CriteriaAddForm(request.POST, initial={
+		        'id_rummage': rummage.id, 
+		        'criteriaId': criteria_id,
+		})
+		print(request.POST)
 		if( form.is_valid()):
 			
 			name = form.cleaned_data['name']
@@ -287,6 +297,8 @@ def criteria_update(request, criteria_id):
 		form = CriteriaAddForm({
 		        'name': criteria.name,
 		        'weight': criteria.weight,
+		        'id_rummage': rummage.id, 
+		        'criteriaId': criteria_id,
 		})
 
 	return render(request, 'app/criteria_update.html', locals())
