@@ -269,6 +269,7 @@ def criteria_delete(request, criteria_id):
 def criteria_update(request, criteria_id):
 
 	criteria = get_object_or_404(Criteria, id = criteria_id)
+	criterias = Criteria.objects.filter(rummage_id = criteria.rummage_id)
 	rummage = get_object_or_404( Rummage, id = criteria.rummage_id)
 	
 	if request.method == 'POST':
@@ -277,7 +278,7 @@ def criteria_update(request, criteria_id):
 		        'id_rummage': rummage.id, 
 		        'criteriaId': criteria_id,
 		})
-		print(request.POST)
+
 		if( form.is_valid()):
 			
 			name = form.cleaned_data['name']
@@ -319,14 +320,20 @@ def rummage_item(request, rummageItemId):
 	
 	rummageItem = get_object_or_404(Rummage_item, id = rummageItemId)
 	rummage = Rummage.objects.filter(id = rummageItem.rummage_id)[0]
-	criterias = Criteria.objects.filter(rummage_id = rummageItem.rummage_id)	
-	notes_list = rummageItem.getNotesList()
-	print(notes_list)
+	criterias = rummageItem.getCriteriasAndNotes()
+	#criterias = Criteria.objects.filter(rummage_id = rummageItem.rummage_id)	
+	#notes_list = rummageItem.getNotesList()
+	
+	#for criteria in criterias:
+		#if( criteria.id in notes_list):
+			#criteria.note = str(notes_list[criteria.id])
+		#else:
+			#criteria.note = '0'
+		
 	context = {
 	        'rummageItem':rummageItem, 
 	        'rummage' : rummage,
 	        'criterias':criterias,
-	        'notes_list' : notes_list,
 	}
 	
 	return render(request, 'app/rummage_item.html', context)
@@ -478,9 +485,9 @@ def note_add(request, rummageItemId):
 				note.save()	
 								
 	rummage = Rummage.objects.get(id = rummageItem.rummage_id)
-	criterias = Criteria.objects.filter(rummage_id = rummageItem.rummage_id)
+	criterias = rummageItem.getCriteriasAndNotes()
 	
-	rummageItem.score = getScore(rummage, criterias, rummageItem)
+	rummageItem.score = rummageItem.getScore(criterias)
 	rummageItem.updated_date = datetime.now()
 	rummageItem.save()
 		

@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 
 from urllib.request import urlopen
 from urllib.parse import urlparse
+from datetime import datetime
 
 from bs4 import BeautifulSoup	
 import json
@@ -171,10 +172,10 @@ class Criteria(models.Model):
     updated_date = models.DateTimeField(auto_now_add=True, auto_now= False, verbose_name="Update date")
     
     def __str__(self):
-        return self.name    
+        return self.name         
     
 class Rummage_item(models.Model):
-    rummage = models.ForeignKey('rummage', on_delete=models.CASCADE)
+    rummage = models.ForeignKey('rummage', on_delete = models.CASCADE)
     lbc_id = models.IntegerField(null = False, unique = True)    
     name = models.CharField(max_length=200)
     url = models.TextField()
@@ -197,7 +198,20 @@ class Rummage_item(models.Model):
             notesList[note.criteria_id] = note.note
     
         return notesList
-    
+            
+    def getCriteriasAndNotes(self):
+        
+        criterias = Criteria.objects.filter(rummage_id = self.rummage_id)
+        notesList = self.getNotesList()
+        
+        for criteria in criterias:
+            
+            if( criteria.id in notesList):
+                criteria.note = str(notesList[criteria.id])
+            else:
+                criteria.note = '0' 
+                
+        return criterias
     
     def getScore( self, criterias):
     

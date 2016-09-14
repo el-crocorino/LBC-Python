@@ -86,7 +86,7 @@
 			{% for criteria in criterias %}
 
 				$( "#slider_{{ criteria.id }}" ).slider({
-					value: {%for criteria_id, criteria_note in notes_list.items %}{% if criteria_id == criteria.id %}{{ criteria_note|default:"0.0" }}{% endif %}{% empty %}0.0{% endfor %}, 
+					value: {{ criteria.note }}, 
 					min: 0,
 					max: 5,
 					step: 0.5,
@@ -107,7 +107,8 @@
 				chart: {
             		renderTo: 'highcharts_container',
 					polar: true,
-					type: 'line'
+					type: 'line',
+					margin: 0,
 				},
 
 				title: {
@@ -126,8 +127,12 @@
 						'{{ criteria.name }}',
 					{% empty %}
 					{% endfor %}],
-					tickmarkPlacement: 'off',
-					lineWidth: 0
+					tickmarkPlacement: 'on',
+					lineWidth: 0,
+					labels: {
+						align: 'center',
+						distance: 50,
+					}
 				},
 
 				yAxis: {
@@ -135,6 +140,9 @@
 					lineWidth: 0,
 					min: 0,
 					max : 5,
+					endOnTick: true,
+					showLastLabel: false,
+					tickPositions: [0, 1, 2, 3, 4, 5],
 				},
 
 				series: [{
@@ -142,12 +150,7 @@
 					name: '{{ rummageItem.name }}',
 					data: [
 					{% for criteria in criterias %}
-						{%for criteria_id, criteria_note in notes_list.items %}
-							{% if criteria_id == criteria.id %}
-								{{ criteria_note }},
-							{% endif %}
-						{% empty %}0.0
-						{% endfor %},
+						{{ criteria.note }},
 					{% empty %}
 					{% endfor %}],
 					pointPlacement: 'on'

@@ -34,14 +34,15 @@ class CriteriaAddForm (ModelForm):
         
         cleaned_data = super(CriteriaAddForm, self).clean()
         criterias = Criteria.objects.filter(rummage_id = cleaned_data.get('id_rummage'))
-        
+
         criteriaWeightSum = 0;
-    
+
         for criteria in criterias:
-            if( criteria.id != cleaned_data.get('criteriaId')):
+
+            if( criteria.id != int(cleaned_data.get('criteriaId'))):
                 criteriaWeightSum += criteria.weight
         
-        criteriaWeightSum += cleaned_data.get('weight')
+        criteriaWeightSum += int(cleaned_data.get('weight'))
         
         if( criteriaWeightSum > 1):
             raise forms.ValidationError(
