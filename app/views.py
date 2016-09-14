@@ -100,9 +100,7 @@ def rummage(request, rummage_id):
 	criterias = Criteria.objects.filter(rummage_id = rummage.id)	
 	query = rummage.getQueryInformations()
 	savedAdsList = rummage.getSavedAdsList()
-	print(savedAdsList)
-	ads_list = {}
-	#ads_list = rummage.getAdsList()
+	ads_list = rummage.getAdsList()
 	
 	
 	
