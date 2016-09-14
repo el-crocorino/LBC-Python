@@ -3,6 +3,7 @@
 from django import forms
 from django.forms import ModelForm, widgets
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 from app.models import Rummage, Criteria, Rummage_item, Note
 
 class RummageAddForm (forms.Form):
@@ -10,6 +11,8 @@ class RummageAddForm (forms.Form):
     url = forms.CharField(label=u"URL : ", help_text=u"Collez ici l'adresse de votre page de recherche", required=True)     
     
 class CriteriaAddForm (ModelForm):
+    
+    id_rummage = forms.CharField(widget = forms.HiddenInput())    
 
     class Meta:
         model = Criteria
@@ -23,9 +26,30 @@ class CriteriaAddForm (ModelForm):
                 'step' : '0.01',
                 'min' : '0.0',
                 'max' : '1.0',
-            })
-        }        
-      
+            }), 
+        }    
+    
+    def clean(self):
+        cleaned_data = super(CriteriaAddForm, self).clean()
+        criterias = Criteria.objects.filter(rummage_id = cleaned_data.get('id_rummage'))
+        
+        criteriaWeightSum = 0;
+    
+        for criteria in criterias:
+            print(criteria.weight)
+            criteriaWeightSum += criteria.weight
+            print(criteriaWeightSum)
+        
+        criteriaWeightSum += cleaned_data.get('weight')
+        
+        if( criteriaWeightSum > 1):
+            raise forms.ValidationError(
+                _('La somme des poids de tous les critères ne doit pas être supérieur à 1: %(value)s'),
+                code='invalid',
+                params={'value': criteriaWeightSum},
+            )
+
+  
 class Rummage_itemAddForm (forms.Form):    
     rummage_id = forms.IntegerField(label=u"Id recherche", required=True)
     selected = forms.BooleanField()

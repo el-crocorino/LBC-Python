@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.shortcuts import get_object_or_404
 
 from urllib.request import urlopen
 from urllib.parse import urlparse

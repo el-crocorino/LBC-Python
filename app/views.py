@@ -218,7 +218,7 @@ def criteria_add(request, rummage_id):
 	rummage = get_object_or_404(Rummage, id = rummage_id)
 
 	if request.method == 'POST':
-
+		print(request.POST)
 		form = CriteriaAddForm(request.POST, initial={"id_rummage": rummage_id})
 
 		if( form.is_valid()):
@@ -309,7 +309,7 @@ def rummage_item(request, rummageItemId):
 	rummage = Rummage.objects.filter(id = rummageItem.rummage_id)[0]
 	criterias = Criteria.objects.filter(rummage_id = rummageItem.rummage_id)	
 	notes_list = rummageItem.getNotesList()
-
+	print(notes_list)
 	context = {
 	        'rummageItem':rummageItem, 
 	        'rummage' : rummage,
