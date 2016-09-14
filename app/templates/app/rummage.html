@@ -12,13 +12,13 @@
 
 	<div class="page-header">
 		<div class="row">
-    		<div class="col-md-9">
-				<a href="{{ rummage.url }}"><h1>{{ rummage.title }}</h1></a>  			
-    		</div>
-    		<div class="rummage-title-actions col-md-3">		
-				<a href="{% url 'app:rummage_update' rummage.id %}"><button type="button" class="btn btn-sm btn-default">Éditer</button></a>
-				<a href="{% url 'app:rummage_delete' rummage.id %}"><button type="button" class="btn btn-sm btn-danger">Supprimer</button></a>   
-    		</div>
+			<div class="col-md-9">
+					<a href="{{ rummage.url }}"><h1>{{ rummage.title }}</h1></a>  			
+			</div>
+			<div class="rummage-title-actions col-md-3">		
+					<a href="{% url 'app:rummage_update' rummage.id %}"><button type="button" class="btn btn-sm btn-default">Éditer</button></a>
+					<a href="{% url 'app:rummage_delete' rummage.id %}"><button type="button" class="btn btn-sm btn-danger">Supprimer</button></a>   
+			</div>
 		</div> 
 	</div>
 
@@ -42,98 +42,104 @@
 	<h2>Critères</h2>
 
 	<div class="row">
-    	<div class="col-md-12">
-    		<table class="table table-striped table-condensed">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Critère</th>
-                <th>Poids</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-				{% for criteria in criterias %}
-	            	<tr>
-	                	<td>
-	                		#
-	                	</td>
-	                	<td>
-	                		{{ criteria.name }}
-	                	</td>
-	                	<td>
-	                		{{ criteria.weight }}
-	                	</td>
-	                	<td align="right">
-	                		<a href="{% url 'app:criteria_update' criteria.id %}"><button type="button" class="btn btn-sm btn-default">Éditer</button></a>
-	                		<a href="{% url 'app:criteria_delete' criteria.id %}"><button type="button" class="btn btn-sm btn-danger">Supprimer</button></a>        
-	                	</td>
-	            	</tr>
-				{% empty %}
-	            	<tr>
-	                	<td>Aucun critère définis pour cette recherche</td>
-	            	</tr>
-				{% endfor %}
-	            </tbody>
-            </table>
-    		<a href="{% url 'app:criteria_add' rummage.id %}"><button type="button" class="btn btn-sm btn-default">Ajouter un critère d'évaluation</button></a>
-    	</div>
-    </div>
+		<div class="col-md-12">
+			<table class="table table-striped table-condensed">
+				<thead>
+				  <tr>
+				<th>#</th>
+				<th>Critère</th>
+				<th>Poids</th>
+				<th></th>
+				  </tr>
+				</thead>
+				<tbody>
+					{% for criteria in criterias %}
+						<tr>
+							<td>
+								#
+							</td>
+							<td>
+								{{ criteria.name }}
+							</td>
+							<td>
+								{{ criteria.weight }}
+							</td>
+							<td align="right">
+								<a href="{% url 'app:criteria_update' criteria.id %}"><button type="button" class="btn btn-sm btn-default">Éditer</button></a>
+								<a href="{% url 'app:criteria_delete' criteria.id %}"><button type="button" class="btn btn-sm btn-danger">Supprimer</button></a>
+							</td>
+						</tr>
+					{% empty %}
+						<tr>
+							<td>Aucun critère définis pour cette recherche</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			<a href="{% url 'app:criteria_add' rummage.id %}"><button type="button" class="btn btn-sm btn-default">Ajouter un critère d'évaluation</button></a>
+		</div>
+	</div>
 
 	<h2>Annonces sauvegardées:</h2>
 
 	<div class="row">
-    	<div class="col-md-12">
-    		<table class="table table-striped table-condensed">
-            <tbody>
-				{% for ad_id, ad_infos in savedAdsList.items %}
-	            	<tr>
-	                	<td>
-	                		<a href="{{ ad_infos.url }}"><img  class="rummage-item-thumbnail" src="{{ ad_infos.thumbnail_url }}" alt="{{ ad_infos.name }} image"></a>
-	                	</td>
-	                	<td>
-	                		<a href="{{ ad_infos.url }}">{{ ad_infos.name }} : {{ ad_infos.price }}</a>
-	                	</td>
-	                	<td>
-	                		{{ ad_infos.updated_date }}
-	                	</td>
-	                	<td>
-	                		{{ ad_infos.score }}
-	                	</td>
-	                	<td align="right" width="20%">
-	                		<a href="{% url 'app:rummage_item' ad_infos.id %}"><button type="button" class="btn btn-sm btn-default">Noter</button></a>  
-	                		<a href="{% url 'app:rummage_item_delete' ad_infos.id %}"><button type="button" class="btn btn-sm btn-danger">Supprimer</button></a>  
-	                	</td>
-	            	</tr>
-				{% empty %}
-	            	<tr>
-	                	<td>Aucune annonce disponible pour cette recherche actuellement.</td>
-	            	</tr>
-				{% endfor %}
-	            </tbody>
-            </table>
-    	</div>
-    </div>
+		<div class="col-md-12">
+			<table class="table table-striped table-condensed">
+				<tbody>
+					{% for ad_id, ad_infos in savedAdsList.items %}
+						<tr
+							{% if ad_infos.disabled %}
+								class="rummage-item-disabled"
+							{% elif ad_infos.type == 'pro' %}
+								class="rummage-item-pro"
+							{% endif %}
+						>
+							<td>
+								<a href="{{ ad_infos.url }}"><img  class="rummage-item-thumbnail" src="{{ ad_infos.thumbnail_url }}" alt="{{ ad_infos.name }} image"></a>
+							</td>
+							<td>{{ ad_infos.type }}
+								<a href="{{ ad_infos.url }}">{{ ad_infos.name }} : {{ ad_infos.price }}</a>
+							</td>
+							<td>
+								{{ ad_infos.updated_date }}
+							</td>
+							<td>
+								{{ ad_infos.score }}
+							</td>
+							<td align="right" width="20%">
+								<a href="{% url 'app:rummage_item' ad_infos.id %}"><button type="button" class="btn btn-sm btn-default">Noter</button></a>  
+								<a href="{% url 'app:rummage_item_delete' ad_infos.id %}"><button type="button" class="btn btn-sm btn-danger">Supprimer</button></a>  
+							</td>
+						</tr>
+					{% empty %}
+						<tr>
+							<td>Aucune annonce disponible pour cette recherche actuellement.</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
 
 	<h2>Annonces disponibles:</h2>
 
 	<div class="row">
-    	<div class="col-md-12">
-    		<table class="table table-striped table-condensed">
-            <tbody>
-				{% for ad_id, ad_infos in ads_list.items %}
-	            	<tr>
-	                	<td>
-	                		<a href="{{ ad_infos.href }}"><img class="rummage-item-thumbnail" src="{{ ad_infos.img_src }}" alt="{{ ad_infos.title }} image"></a>
-	                	</td>
-	                	<td>
-	                		<a href="{{ ad_infos.href }}">{{ ad_infos.title }} : {{ ad_infos.price }}</a>
-	                	</td>
-	                	<td>
-	                		<!-- {{ ad_infos.title }} TODO display post date -->
-	                	</td>
-	                	<td align="right" width="20%">
-	                		<form action="{% url 'app:rummage_item_add' rummage.id %}" method="POST">{% csrf_token %}
+		<div class="col-md-12">
+			<table class="table table-striped table-condensed">
+				<tbody>
+					{% for ad_id, ad_infos in ads_list.items %}
+						<tr {% if ad_infos.disabled %}class="rummage-item-disabled"{% elif ad_infos.type == 'pro' %}class="rummage-item-pro"{% endif %}>
+						<td>
+							<a href="{{ ad_infos.href }}"><img class="rummage-item-thumbnail" src="{{ ad_infos.img_src }}" alt="{{ ad_infos.title }} image"></a>
+						</td>
+						<td>
+							<a href="{{ ad_infos.href }}">{% if ad_infos.type == 'pro' %}PRO - {% endif %}{{ ad_infos.title }} : {{ ad_infos.price }}</a>
+						</td>
+						<td>
+							<!-- {{ ad_infos.title }} TODO display post date -->
+						</td>
+						<td align="right" width="20%">
+							<form action="{% url 'app:rummage_item_add' rummage.id %}" method="POST">{% csrf_token %}
 								<input type="hidden" name="selected" value="True">
 								<input type="hidden" name="rummage_id" value="{{ rummage.id }}">
 								<input type="hidden" name="lbc_id" value="{{ ad_id }}">
@@ -144,18 +150,18 @@
 								<input type="hidden" name="infos" value="{{ ad_infos.data_info }}">
 								<input type="submit" class="btn btn-sm btn-default" value="Sauvegarder">
 							</form>
-	                		<a href="{% url 'app:rummage_item_delete' ad_id %}"><button type="button" class="btn btn-sm btn-danger">Ignorer</button></a>  
-	                	</td>
-	            	</tr>
-				{% empty %}
-	            	<tr>
-	                	<td>Aucune annonce disponible pour cette recherche actuellement.</td>
-	            	</tr>
-				{% endfor %}
-	            </tbody>
-            </table>
-    	</div>
-    </div>
+							<a href="{% url 'app:rummage_item_delete' ad_id %}"><button type="button" class="btn btn-sm btn-danger">Ignorer</button></a>  
+						</td>
+						</tr>
+					{% empty %}
+						<tr>
+							<td>Aucune annonce disponible pour cette recherche actuellement.</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
 </div>
 
 

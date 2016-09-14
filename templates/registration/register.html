@@ -1,0 +1,20 @@
+{% extends "app/base.html" %}
+
+{% block title %}Inscription{% endblock %}
+
+{% block head %}Inscription{% endblock %}
+
+{% block content %}
+
+	<div class="container">
+		<form method="POST" action="." class="form-signin">{% csrf_token %}
+			<h2 class="form-signin-heading">Inscription</h2>	
+			<table border="0">
+				{{ form.as_table }}
+			</table>
+			<input type="submit" value="Register" />
+		</form>
+	<a href="/">Login</a>
+		
+	</div>
+{% endblock %}
