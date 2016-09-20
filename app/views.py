@@ -102,6 +102,13 @@ def rummage(request, rummage_id):
 	savedAdsList = rummage.getSavedAdsList()
 	ads_list = rummage.getAdsList()
 	
+	
+	
+	for savedAdId, savedAdData in savedAdsList.items():
+		rummageItem = Rummage_item.objects.get(id = savedAdData['id'])
+		savedAdCriterias = rummageItem.getCriteriasAndNotes()
+		savedAdsList[savedAdId]['criterias'] = savedAdCriterias
+	
 	context = {
 	        'rummage':rummage, 
 	        'criterias':criterias,
@@ -321,15 +328,7 @@ def rummage_item(request, rummageItemId):
 	rummageItem = get_object_or_404(Rummage_item, id = rummageItemId)
 	rummage = Rummage.objects.filter(id = rummageItem.rummage_id)[0]
 	criterias = rummageItem.getCriteriasAndNotes()
-	#criterias = Criteria.objects.filter(rummage_id = rummageItem.rummage_id)	
-	#notes_list = rummageItem.getNotesList()
 	
-	#for criteria in criterias:
-		#if( criteria.id in notes_list):
-			#criteria.note = str(notes_list[criteria.id])
-		#else:
-			#criteria.note = '0'
-		
 	context = {
 	        'rummageItem':rummageItem, 
 	        'rummage' : rummage,
