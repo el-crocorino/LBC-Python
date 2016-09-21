@@ -5,6 +5,9 @@
  Inscription terminée
 {% endblock %}
 {% block content %}
-    Merci pour votre inscription.
-    <a href="{% url 'login' %}">Connexion</a> 
+
+	<div class="page-header">
+		<h2>Inscription teminée</h2>
+    	Merci pour votre inscription. Vous pouvez maintenant vous <a href="{% url 'login' %}">connecter</a>. 		
+	</div>
 {% endblock %}
