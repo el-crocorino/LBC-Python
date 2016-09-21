@@ -67,27 +67,29 @@ def logout(request):
 
 @csrf_protect
 def register(request):
+	
 	if request.method == 'POST':
+		
 		form = RegistrationForm(request.POST)
+		
 		if form.is_valid():
+			
 			user = User.objects.create_user(
 			        username=form.cleaned_data['username'],
 			        password=form.cleaned_data['password1'],
 			        email=form.cleaned_data['email']
 			)
-			return HttpResponseRedirect('/accounts/register/success/')
-	else:
+			
+			return HttpResponseRedirect('/accounts/register_success/')
+	else:	
 		form = RegistrationForm()
-
-	variables = RequestContext(request, {
-	        'form': form
-	})
-
-	return render_to_response(
-	        'registration/register.html',
-	        variables,
-	)
-
+		variables = RequestContext(request, {
+			'form': form
+		})
+		
+		
+		return render(request, 'registration/register.html', locals())		
+	
 def register_success(request):
 	return render_to_response(
 	        'registration/register_success.html',
@@ -101,8 +103,6 @@ def rummage(request, rummage_id):
 	query = rummage.getQueryInformations()
 	savedAdsList = rummage.getSavedAdsList()
 	ads_list = rummage.getAdsList()
-	
-	
 	
 	for savedAdId, savedAdData in savedAdsList.items():
 		rummageItem = Rummage_item.objects.get(id = savedAdData['id'])
